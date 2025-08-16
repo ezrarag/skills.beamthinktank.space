@@ -230,14 +230,14 @@ export default function InstructorsPage() {
                       <p className="text-gray-700 mb-4 line-clamp-3">{instructor.bio}</p>
                       
                       <div className="flex flex-wrap gap-2 mb-4">
-                        {instructor.expertise.slice(0, 3).map((skill) => (
-                          <span
-                            key={skill}
-                            className="inline-block bg-secondary-100 text-secondary-700 text-xs font-medium px-2 py-1 rounded-full"
-                          >
-                            {skill}
-                          </span>
-                        ))}
+                                                 {instructor.expertise.slice(0, 3).map((skill) => (
+                           <span
+                             key={skill}
+                             className="inline-block bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-full"
+                           >
+                             {skill}
+                           </span>
+                         ))}
                         {instructor.expertise.length > 3 && (
                           <span className="inline-block bg-gray-100 text-gray-600 text-xs font-medium px-2 py-1 rounded-full">
                             +{instructor.expertise.length - 3} more
