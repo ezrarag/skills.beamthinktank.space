@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, Clock, Users, MapPin, Filter, ChevronLeft, ChevronRight, Heart, ArrowRight, ChevronDown, ChevronUp, Brain, BookOpen, Award, LogIn, UserPlus } from 'lucide-react'
+import { Calendar, Clock, Users, MapPin, Filter, ChevronLeft, ChevronRight, Heart, ArrowRight, ChevronDown, ChevronUp, Brain, BookOpen, Award, LogIn, UserPlus, Hammer } from 'lucide-react'
 
 const scheduleData = [
   {
@@ -248,13 +248,15 @@ export default function SchedulePage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
+                <Hammer className="h-5 w-5" />
                 <span className="font-satoshi">Schedule</span>
                 <motion.div
                   animate={{ rotate: isSkillsDropdownOpen ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
                 >
                   <ChevronDown className="h-5 w-5" />
-                </motion.button>
+                </motion.div>
+              </motion.button>
 
               {/* Skills Dropdown Menu */}
               <AnimatePresence>
@@ -281,7 +283,7 @@ export default function SchedulePage() {
                       <div className="px-4 py-2">
                         <Link 
                           href="/courses" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
                           onClick={closeSkillsDropdown}
                         >
                           <BookOpen className="h-5 w-5" />
@@ -290,7 +292,7 @@ export default function SchedulePage() {
                         
                         <Link 
                           href="/instructors" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
                           onClick={closeSkillsDropdown}
                         >
                           <Users className="h-5 w-5" />
@@ -299,7 +301,7 @@ export default function SchedulePage() {
                         
                         <Link 
                           href="/schedule" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
                           onClick={closeSkillsDropdown}
                         >
                           <Calendar className="h-5 w-5" />
@@ -308,7 +310,7 @@ export default function SchedulePage() {
                         
                         <Link 
                           href="/certifications" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
                           onClick={closeSkillsDropdown}
                         >
                           <Award className="h-5 w-5" />

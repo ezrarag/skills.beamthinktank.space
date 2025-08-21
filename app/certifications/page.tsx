@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Award, Filter, Search, Calendar, Star, ArrowRight, CheckCircle, Clock } from 'lucide-react'
+import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Award, ChevronDown, ChevronUp, BookOpen, Users, Calendar, LogIn, UserPlus, Hammer, CheckCircle, Star, Clock, Filter, Search, ArrowRight } from 'lucide-react'
 
 const certifications = [
   {
@@ -34,6 +36,15 @@ export default function CertificationsPage() {
   const [selectedStatus, setSelectedStatus] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('recent')
+  const [isSkillsDropdownOpen, setIsSkillsDropdownOpen] = useState(false)
+
+  const toggleSkillsDropdown = () => {
+    setIsSkillsDropdownOpen(!isSkillsDropdownOpen)
+  }
+
+  const closeSkillsDropdown = () => {
+    setIsSkillsDropdownOpen(false)
+  }
 
   const filteredCertifications = certifications.filter(cert => {
     const matchesStatus = selectedStatus === 'All' || cert.status === selectedStatus
@@ -79,10 +90,120 @@ export default function CertificationsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white py-20">
+      <div className="bg-gradient-to-br from-[#7A3B3B] to-[#6A2B2B] text-white py-20">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">My Certifications</h1>
-          <p className="text-xl text-primary-100 max-w-3xl mx-auto leading-relaxed">
+          <div className="flex justify-center items-center mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold mb-0 mr-6 font-satoshi">My Certifications</h1>
+            
+            {/* Skills Dropdown Button */}
+            <div className="relative">
+              <motion.button
+                onClick={toggleSkillsDropdown}
+                className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 text-white font-medium px-6 py-3 rounded-full transition-all duration-300 backdrop-blur-sm"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Hammer className="h-5 w-5" />
+                <span className="font-satoshi">Certifications</span>
+                <motion.div
+                  animate={{ rotate: isSkillsDropdownOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronDown className="h-5 w-5" />
+                </motion.div>
+              </motion.button>
+
+              {/* Skills Dropdown Menu */}
+              <AnimatePresence>
+                {isSkillsDropdownOpen && (
+                  <>
+                    {/* Backdrop */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 z-40"
+                      onClick={closeSkillsDropdown}
+                    />
+                    
+                    {/* Dropdown Content */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 py-2 z-50"
+                    >
+                      {/* Navigation Links */}
+                      <div className="px-4 py-2">
+                        <Link 
+                          href="/courses" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <BookOpen className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Courses</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/instructors" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Users className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Instructors</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/schedule" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Calendar className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Schedule</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/certifications" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Award className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Certifications</span>
+                        </Link>
+                      </div>
+                      
+                      {/* Divider */}
+                      <div className="border-t border-gray-200 my-2" />
+                      
+                      {/* Auth Links */}
+                      <div className="px-4 py-2">
+                        <Link 
+                          href="/login" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <LogIn className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Sign In</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/register" 
+                          className="flex items-center space-x-3 px-3 py-3 text-[#7A3B3B] hover:text-[#6A2B2B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <UserPlus className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Get Started</span>
+                        </Link>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+          
+          <p className="text-xl text-white/90 max-w-3xl mx-auto font-satoshi">
             Track your learning achievements and showcase your new skills with official certificates
           </p>
         </div>

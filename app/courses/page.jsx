@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, Clock, Users, Star, Filter, Search, Heart, ArrowRight, Mail, ExternalLink, ChevronDown, ChevronUp, Brain, Calendar, Award, LogIn, UserPlus } from 'lucide-react'
+import { BookOpen, Clock, Users, Star, Filter, Search, Heart, ArrowRight, Lightbulb, ExternalLink, ChevronDown, ChevronUp, Brain, Calendar, Award, LogIn, UserPlus, Hammer } from 'lucide-react'
 
 const categories = [
   'All',
@@ -315,6 +315,7 @@ export default function CoursesPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
+                <Hammer className="h-5 w-5" />
                 <span className="font-satoshi">Skills</span>
                 <motion.div
                   animate={{ rotate: isSkillsDropdownOpen ? 180 : 0 }}
@@ -349,7 +350,7 @@ export default function CoursesPage() {
                       <div className="px-4 py-2">
                         <Link 
                           href="/courses" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
                           onClick={closeSkillsDropdown}
                         >
                           <BookOpen className="h-5 w-5" />
@@ -358,7 +359,7 @@ export default function CoursesPage() {
                         
                         <Link 
                           href="/instructors" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
                           onClick={closeSkillsDropdown}
                         >
                           <Users className="h-5 w-5" />
@@ -367,7 +368,7 @@ export default function CoursesPage() {
                         
                         <Link 
                           href="/schedule" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
                           onClick={closeSkillsDropdown}
                         >
                           <Calendar className="h-5 w-5" />
@@ -376,7 +377,7 @@ export default function CoursesPage() {
                         
                         <Link 
                           href="/certifications" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
                           onClick={closeSkillsDropdown}
                         >
                           <Award className="h-5 w-5" />
@@ -391,7 +392,7 @@ export default function CoursesPage() {
                       <div className="px-4 py-2">
                         <Link 
                           href="/login" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
                           onClick={closeSkillsDropdown}
                         >
                           <LogIn className="h-5 w-5" />
@@ -400,7 +401,7 @@ export default function CoursesPage() {
                         
                         <Link 
                           href="/register" 
-                          className="flex items-center space-x-3 px-3 py-3 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-[#7A3B3B] hover:text-[#6A2B2B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
                           onClick={closeSkillsDropdown}
                         >
                           <UserPlus className="h-5 w-5" />
@@ -590,7 +591,7 @@ export default function CoursesPage() {
                       {/* Action Icons */}
                       <div className="absolute top-4 left-4 flex flex-col gap-2">
                         <motion.div 
-                          className="w-10 h-10 bg-red-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-800 transition-colors"
+                          className="w-10 h-10 bg-[#7A3B3B] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#6A2B2B] transition-colors"
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={(e) => {
@@ -599,10 +600,10 @@ export default function CoursesPage() {
                             window.location.href = `/enroll/${course.id}`
                           }}
                         >
-                          <Mail className="h-5 w-5 text-white" />
+                          <Lightbulb className="h-5 w-5 text-white" />
                         </motion.div>
                         <motion.div 
-                          className="w-10 h-10 bg-red-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-800 transition-colors"
+                          className="w-10 h-10 bg-[#7A3B3B] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#6A2B2B] transition-colors"
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.95 }}
                           onClick={(e) => {
@@ -624,8 +625,9 @@ export default function CoursesPage() {
                           <span className="text-sm text-gray-500 font-medium">{course.level}</span>
                         </div>
                         
-                        <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">{course.title}</h3>
-                        <p className="text-gray-600 mb-6 leading-relaxed text-lg">{course.description}</p>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-[#7A3B3B] transition-colors">{course.title}</h3>
+                        <p className="text-gray-600 mb-2 leading-relaxed text-lg">{course.description}</p>
+                        <p className="text-[#7A3B3B] text-sm font-medium mb-6">Show More</p>
                         
                         <div className="space-y-3 mb-6">
                           <div className="flex items-center text-gray-600">
@@ -650,7 +652,7 @@ export default function CoursesPage() {
                       <div className="flex items-center justify-between">
                         <div className="text-2xl font-bold text-green-600">{course.price}</div>
                         <motion.button
-                          className="flex items-center text-primary-600 font-semibold group-hover:text-primary-700 transition-colors"
+                          className="flex items-center text-[#7A3B3B] font-semibold group-hover:text-[#6A2B2B] transition-colors"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
                         >
