@@ -1,16 +1,10 @@
 import type { Metadata } from 'next'
-import { Inter, Poppins } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import './globals.css'
 
 const inter = Inter({ 
   subsets: ['latin'],
   variable: '--font-inter',
-})
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--font-poppins',
 })
 
 export const metadata: Metadata = {
@@ -25,7 +19,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${poppins.variable} font-sans`}>
+      <head>
+        <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet" />
+      </head>
+      <body className={`${inter.variable} font-satoshi`}>
         <div className="min-h-screen bg-gray-50">
           {children}
         </div>

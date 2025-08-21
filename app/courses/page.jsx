@@ -2,13 +2,19 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { BookOpen, Clock, Users, Star, Filter, Search, Heart, ArrowRight } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { BookOpen, Clock, Users, Star, Filter, Search, Heart, ArrowRight, Mail, ExternalLink, ChevronDown, ChevronUp, Brain, Calendar, Award, LogIn, UserPlus } from 'lucide-react'
 
 const categories = [
   'All',
   'Technology',
   'Transportation',
-  'Community Skills'
+  'Community Skills',
+  'Health & Wellness',
+  'Arts & Music',
+  'Business & Finance',
+  'Real Estate',
+  'Digital Finance'
 ]
 
 const courses = [
@@ -23,7 +29,9 @@ const courses = [
     rating: 4.9,
     instructor: "BEAM Skills Volunteer Team",
     level: "Beginner",
-    featured: true
+    featured: true,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/home/pexels-kampus-7983573.jpg", // Placeholder for tech course image
+    videoUrl: null
   },
   {
     id: 2,
@@ -36,20 +44,195 @@ const courses = [
     rating: 4.8,
     instructor: "BEAM Skills Volunteer Mechanics",
     level: "Beginner",
-    featured: true
+    featured: true,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-daniel-andraski-197681005-13065692.jpg", // Placeholder for car maintenance image
+    videoUrl: null
   },
   {
     id: 3,
     title: "Orchestra Repertoire for Beginners",
     description: "A welcoming introduction to orchestral music for beginners. Learn how to explore, prepare, and perform standard orchestra repertoire. Students will be guided through essential resources, performance history, technical lessons, and rehearsal prep skills to build a solid foundation in orchestral playing.",
-    category: "Community Skills",
+    category: "Arts & Music",
     price: "Free (unlocked through community donations)",
     duration: "16 weeks (1.5 hrs / session)",
     students: 0,
     rating: 4.7,
     instructor: "BEAM Skills Music Volunteers",
     level: "Beginner",
-    featured: true
+    featured: true,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-tima-miroshnichenko-6671694.jpg", // Placeholder for orchestra image
+    videoUrl: null
+  },
+  {
+    id: 4,
+    title: "Planting & Houseplants: Community Green Skills",
+    description: "Learn plant care, propagation, and community gardening. Create mini community garden projects and care for at least 3 plants.",
+    category: "Community Skills",
+    price: "Free (unlocked through community donations)",
+    duration: "8 weeks (1.5 hrs / session)",
+    students: 0,
+    rating: 4.6,
+    instructor: "Local Practitioner / Beginner-friendly Mentor",
+    level: "Beginner",
+    featured: false,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-zen-chung-5529587.jpg", // Placeholder for planting course image
+    videoUrl: null,
+    location: "Cleveland Ave Library",
+    startDate: "2024-09-10",
+    endDate: "2024-11-05",
+    classTime: "Tuesdays, 6:00 PM - 7:30 PM"
+  },
+  {
+    id: 5,
+    title: "Emergency & Proactive Health Skills",
+    description: "Learn CPR, first aid, home remedies, and preventive care. Practice emergency response skills and basic medical procedures.",
+    category: "Health & Wellness",
+    price: "Free (unlocked through community donations)",
+    duration: "10 weeks (2 hrs / session)",
+    students: 0,
+    rating: 4.8,
+    instructor: "Certified Healthcare Professional",
+    level: "Beginner",
+    featured: false,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-duy-tan-d-i-h-c-842966226-30902100.jpg", // Placeholder for health skills image
+    videoUrl: null,
+    location: "Cleveland Ave Library",
+    startDate: "2024-09-11",
+    endDate: "2024-11-13",
+    classTime: "Wednesdays, 6:00 PM - 8:00 PM"
+  },
+  {
+    id: 6,
+    title: "Audio Recording & Production",
+    description: "Master audio gear, recording setups, mixing, and mastering. Complete a full recording project with professional guidance.",
+    category: "Arts & Music",
+    price: "Free (unlocked through community donations)",
+    duration: "12 weeks (2 hrs / session)",
+    students: 0,
+    rating: 4.5,
+    instructor: "Audio Engineer / Advanced Musician",
+    level: "Intermediate",
+    featured: false,
+    imageUrl: "/images/courses/audio-recording.jpg", // Placeholder for audio recording image
+    videoUrl: null,
+    location: "Cleveland Ave Library",
+    startDate: "2024-09-12",
+    endDate: "2024-12-05",
+    classTime: "Thursdays, 6:00 PM - 8:00 PM"
+  },
+  {
+    id: 7,
+    title: "Band Instruments – Multi-Genre Training",
+    description: "Learn strings, brass, percussion, and woodwinds across jazz, classical, and contemporary genres. Perform in ensemble showcases.",
+    category: "Arts & Music",
+    price: "Free (unlocked through community donations)",
+    duration: "14 weeks (1.5 hrs / session)",
+    students: 0,
+    rating: 4.7,
+    instructor: "Experienced Musician / Mentor",
+    level: "Beginner",
+    featured: false,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-dean-fugate-579564645-17028509.jpg", // Placeholder for band instruments image
+    videoUrl: null,
+    location: "Cleveland Ave Library",
+    startDate: "2024-09-13",
+    endDate: "2024-12-20",
+    classTime: "Fridays, 6:00 PM - 7:30 PM"
+  },
+  {
+    id: 8,
+    title: "Voice Training – Multi-Genre",
+    description: "Master breath control, pitch, tone, and diction across classical, jazz, and contemporary styles. Perform in public showcases.",
+    category: "Arts & Music",
+    price: "Free (unlocked through community donations)",
+    duration: "12 weeks (1.5 hrs / session)",
+    students: 0,
+    rating: 4.6,
+    instructor: "Vocal Coach / Mentor",
+    level: "Beginner",
+    featured: false,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-cristian-rojas-7586662.jpg", // Placeholder for voice training image
+    videoUrl: null,
+    location: "Cleveland Ave Library",
+    startDate: "2024-09-14",
+    endDate: "2024-12-07",
+    classTime: "Saturdays, 10:00 AM - 11:30 AM"
+  },
+  {
+    id: 9,
+    title: "Community Beautification & Design",
+    description: "Learn urban aesthetics, public space design, and DIY skills. Complete small-scale public beautification projects.",
+    category: "Community Skills",
+    price: "Free (unlocked through community donations)",
+    duration: "10 weeks (2 hrs / session)",
+    students: 0,
+    rating: 4.5,
+    instructor: "Local Designer / Advanced Participant",
+    level: "Beginner",
+    featured: false,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-rstephens-33501308.jpg", // Placeholder for beautification image
+    videoUrl: null,
+    location: "Cleveland Ave Library",
+    startDate: "2024-09-15",
+    endDate: "2024-11-17",
+    classTime: "Sundays, 2:00 PM - 4:00 PM"
+  },
+  {
+    id: 10,
+    title: "Entrepreneurship & Business Building",
+    description: "Master business planning, marketing, and scaling strategies. Create and present business plans to mentor panels.",
+    category: "Business & Finance",
+    price: "Free (unlocked through community donations)",
+    duration: "12 weeks (2 hrs / session)",
+    students: 0,
+    rating: 4.7,
+    instructor: "Experienced Entrepreneur / Business Mentor",
+    level: "Intermediate",
+    featured: false,
+    imageUrl: "/images/courses/entrepreneurship.jpg", // Placeholder for entrepreneurship image
+    videoUrl: null,
+    location: "Cleveland Ave Library",
+    startDate: "2024-09-16",
+    endDate: "2024-12-09",
+    classTime: "Mondays, 6:00 PM - 8:00 PM"
+  },
+  {
+    id: 11,
+    title: "Commercial Real Estate Acquisition & Development",
+    description: "Learn commercial real estate fundamentals, investment strategies, and construction management. Analyze real properties.",
+    category: "Real Estate",
+    price: "Free (unlocked through community donations)",
+    duration: "14 weeks (2.5 hrs / session)",
+    students: 0,
+    rating: 4.8,
+    instructor: "Real Estate Developer / Finance Mentor",
+    level: "Advanced",
+    featured: false,
+    imageUrl: "/images/courses/real-estate.jpg", // Placeholder for real estate image
+    videoUrl: null,
+    location: "Cleveland Ave Library",
+    startDate: "2024-09-17",
+    endDate: "2024-12-24",
+    classTime: "Tuesdays, 6:00 PM - 8:30 PM"
+  },
+  {
+    id: 12,
+    title: "Cryptocurrency & Digital Finance",
+    description: "Master crypto fundamentals, blockchain technology, and DeFi basics. Complete wallet creation and trading simulations.",
+    category: "Digital Finance",
+    price: "Free (unlocked through community donations)",
+    duration: "10 weeks (2 hrs / session)",
+    students: 0,
+    rating: 4.6,
+    instructor: "Crypto Professional / Fintech Mentor",
+    level: "Intermediate",
+    featured: false,
+    imageUrl: "/images/courses/cryptocurrency.jpg", // Placeholder for crypto image
+    videoUrl: null,
+    location: "Cleveland Ave Library",
+    startDate: "2024-09-18",
+    endDate: "2024-11-20",
+    classTime: "Wednesdays, 6:00 PM - 8:00 PM"
   }
 ]
 
@@ -59,6 +242,8 @@ export default function CoursesPage() {
   const [sortBy, setSortBy] = useState('rating')
   const [priceFilter, setPriceFilter] = useState(['Free (Community Funded)'])
   const [levelFilter, setLevelFilter] = useState(['Beginner'])
+  const [expandedCard, setExpandedCard] = useState(null)
+  const [isSkillsDropdownOpen, setIsSkillsDropdownOpen] = useState(false)
 
   const filteredCourses = courses.filter(course => {
     const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory
@@ -102,12 +287,132 @@ export default function CoursesPage() {
     )
   }
 
+  const toggleCardExpansion = (courseId) => {
+    setExpandedCard(expandedCard === courseId ? null : courseId)
+  }
+
+  const toggleSkillsDropdown = () => {
+    setIsSkillsDropdownOpen(!isSkillsDropdownOpen)
+  }
+
+  const closeSkillsDropdown = () => {
+    setIsSkillsDropdownOpen(false)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white py-20">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">Browse Courses</h1>
+          <div className="flex justify-center items-center mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold mb-0 mr-6">Browse Courses</h1>
+            
+            {/* Skills Dropdown Button */}
+            <div className="relative">
+              <motion.button
+                onClick={toggleSkillsDropdown}
+                className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 text-white font-medium px-6 py-3 rounded-full transition-all duration-300 backdrop-blur-sm"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="font-satoshi">Skills</span>
+                <motion.div
+                  animate={{ rotate: isSkillsDropdownOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronDown className="h-5 w-5" />
+                </motion.div>
+              </motion.button>
+
+              {/* Skills Dropdown Menu */}
+              <AnimatePresence>
+                {isSkillsDropdownOpen && (
+                  <>
+                    {/* Backdrop */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 z-40"
+                      onClick={closeSkillsDropdown}
+                    />
+                    
+                    {/* Dropdown Content */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 py-2 z-50"
+                    >
+                      {/* Navigation Links */}
+                      <div className="px-4 py-2">
+                        <Link 
+                          href="/courses" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <BookOpen className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Courses</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/instructors" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Users className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Instructors</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/schedule" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Calendar className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Schedule</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/certifications" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Award className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Certifications</span>
+                        </Link>
+                      </div>
+                      
+                      {/* Divider */}
+                      <div className="border-t border-gray-200 my-2" />
+                      
+                      {/* Auth Links */}
+                      <div className="px-4 py-2">
+                        <Link 
+                          href="/login" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <LogIn className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Sign In</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/register" 
+                          className="flex items-center space-x-3 px-3 py-3 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <UserPlus className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Get Started</span>
+                        </Link>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
           <p className="text-xl text-primary-100 max-w-3xl mx-auto leading-relaxed">
             Find the perfect course to advance your skills and transform your career
           </p>
@@ -181,7 +486,7 @@ export default function CoursesPage() {
                       onChange={() => handleLevelFilterChange('Beginner')}
                     />
                     <span className="text-gray-700 group-hover:text-primary-600 transition-colors">Beginner</span>
-                  </label>
+                    </label>
                   <label className="flex items-center cursor-pointer group">
                     <input 
                       type="checkbox" 
@@ -241,57 +546,185 @@ export default function CoursesPage() {
             {/* Course Grid */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
               {sortedCourses.map((course) => (
-                <div key={course.id} className="group cursor-pointer">
-                  <div className="card hover:shadow-xl transition-all duration-300 border border-gray-100 group-hover:border-primary-200">
-                    {course.featured && (
-                      <div className="absolute top-4 right-4 bg-primary-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                        Featured
-                      </div>
-                    )}
-                    
-                    <div className="h-56 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl mb-6 flex items-center justify-center group-hover:from-primary-200 group-hover:to-primary-300 transition-all duration-300">
-                      <BookOpen className="h-20 w-20 text-primary-600 group-hover:scale-110 transition-transform duration-300" />
-                    </div>
-                    
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="inline-block bg-primary-100 text-primary-700 text-sm font-semibold px-4 py-2 rounded-full">
-                          {course.category}
-                        </span>
-                        <span className="text-sm text-gray-500 font-medium">{course.level}</span>
+                <motion.div 
+                  key={course.id} 
+                  className="group cursor-pointer"
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <motion.div 
+                    className="card hover:shadow-xl transition-all duration-300 border border-gray-100 group-hover:border-primary-200 overflow-hidden"
+                    layout
+                    onClick={() => toggleCardExpansion(course.id)}
+                  >
+                    {/* Compact Card View (Profile Card Style) */}
+                    <motion.div 
+                      className="relative"
+                      layout
+                    >
+                      {/* Course Image */}
+                      <div className="h-64 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl mb-6 flex items-center justify-center group-hover:from-primary-200 group-hover:to-primary-300 transition-all duration-300 overflow-hidden">
+                        {course.videoUrl ? (
+                          <video 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            autoPlay 
+                            muted 
+                            loop
+                            poster={course.imageUrl}
+                          >
+                            <source src={course.videoUrl} type="video/mp4" />
+                          </video>
+                        ) : course.imageUrl ? (
+                          <img 
+                            src={course.imageUrl} 
+                            alt={course.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <BookOpen className="h-20 w-20 text-primary-600 group-hover:scale-110 transition-transform duration-300" />
+                        )}
                       </div>
                       
-                      <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">{course.title}</h3>
-                      <p className="text-gray-600 mb-6 leading-relaxed text-lg">{course.description}</p>
+                      {/* Action Icons */}
+                      <div className="absolute top-4 left-4 flex flex-col gap-2">
+                        <motion.div 
+                          className="w-10 h-10 bg-red-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-800 transition-colors"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            // Navigate to enrollment page
+                            window.location.href = `/enroll/${course.id}`
+                          }}
+                        >
+                          <Mail className="h-5 w-5 text-white" />
+                        </motion.div>
+                        <motion.div 
+                          className="w-10 h-10 bg-red-700 rounded-full flex items-center justify-center cursor-pointer hover:bg-red-800 transition-colors"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            // Navigate to course detail page
+                            window.location.href = `/courses/${course.id}`
+                          }}
+                        >
+                          <ExternalLink className="h-5 w-5 text-white" />
+                        </motion.div>
+                      </div>
                       
-                      <div className="space-y-3 mb-6">
-                        <div className="flex items-center text-gray-600">
-                          <Star className="h-5 w-5 text-yellow-400 mr-3" />
-                          <span className="font-medium">{course.rating}</span>
-                          <span className="ml-2">(community pilot)</span>
+                      {/* Course Info */}
+                      <div className="mb-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <span className="inline-block bg-primary-100 text-primary-700 text-sm font-semibold px-4 py-2 rounded-full">
+                            {course.category}
+                          </span>
+                          <span className="text-sm text-gray-500 font-medium">{course.level}</span>
                         </div>
                         
-                        <div className="flex items-center text-gray-600">
-                          <Clock className="h-5 w-5 text-primary-600 mr-3" />
-                          <span>{course.duration}</span>
-                        </div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-primary-600 transition-colors">{course.title}</h3>
+                        <p className="text-gray-600 mb-6 leading-relaxed text-lg">{course.description}</p>
                         
-                        <div className="flex items-center text-gray-600">
-                          <Users className="h-5 w-5 text-primary-600 mr-3" />
-                          <span>{course.instructor}</span>
+                        <div className="space-y-3 mb-6">
+                          <div className="flex items-center text-gray-600">
+                            <Star className="h-5 w-5 text-yellow-400 mr-3" />
+                            <span className="font-medium">{course.rating}</span>
+                            <span className="ml-2">(community pilot)</span>
+                          </div>
+                          
+                          <div className="flex items-center text-gray-600">
+                            <Clock className="h-5 w-5 text-primary-600 mr-3" />
+                            <span>{course.duration}</span>
+                          </div>
+                          
+                          <div className="flex items-center text-gray-600">
+                            <Users className="h-5 w-5 text-primary-600 mr-3" />
+                            <span>{course.instructor}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="text-2xl font-bold text-green-600">{course.price}</div>
-                      <Link href={`/courses/${course.id}`} className="flex items-center text-primary-600 font-semibold group-hover:text-primary-700 transition-colors">
-                        View Course
-                        <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
+                      
+                      {/* Price and Expand Button */}
+                      <div className="flex items-center justify-between">
+                        <div className="text-2xl font-bold text-green-600">{course.price}</div>
+                        <motion.button
+                          className="flex items-center text-primary-600 font-semibold group-hover:text-primary-700 transition-colors"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {expandedCard === course.id ? (
+                            <>
+                              <span>Show Less</span>
+                              <ChevronUp className="h-5 w-5 ml-2" />
+                            </>
+                          ) : (
+                            <>
+                              <span>Show More</span>
+                              <ChevronDown className="h-5 w-5 ml-2" />
+                            </>
+                          )}
+                        </motion.button>
+                      </div>
+                    </motion.div>
+
+                    {/* Expanded Content */}
+                    <AnimatePresence>
+                      {expandedCard === course.id && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                          className="overflow-hidden"
+                        >
+                          <div className="border-t border-gray-200 pt-6 mt-6">
+                            {/* Additional Course Details */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                              <div>
+                                <h4 className="font-semibold text-gray-900 mb-3">Course Details</h4>
+                                <div className="space-y-2 text-sm text-gray-600">
+                                  <div><strong>Location:</strong> {course.location || 'TBD'}</div>
+                                  <div><strong>Start Date:</strong> {course.startDate || 'TBD'}</div>
+                                  <div><strong>End Date:</strong> {course.endDate || 'TBD'}</div>
+                                  <div><strong>Class Time:</strong> {course.classTime || 'TBD'}</div>
+                                </div>
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-gray-900 mb-3">What You'll Learn</h4>
+                                <ul className="space-y-1 text-sm text-gray-600">
+                                  <li>• Practical skills for real-world application</li>
+                                  <li>• Community-focused learning approach</li>
+                                  <li>• Hands-on experience and projects</li>
+                                  <li>• Professional mentorship and guidance</li>
+                                </ul>
+                              </div>
+                            </div>
+                            
+                            {/* Action Buttons */}
+                            <div className="flex flex-col sm:flex-row gap-4">
+                              <Link 
+                                href={`/enroll/${course.id}`}
+                                className="btn-primary flex-1 text-center"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                Enroll Now
+                              </Link>
+                              <Link 
+                                href={`/courses/${course.id}`}
+                                className="btn-secondary flex-1 text-center"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                View Full Details
+                              </Link>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                </motion.div>
               ))}
             </div>
 
@@ -312,7 +745,7 @@ export default function CoursesPage() {
                   Clear Filters
                 </button>
               </div>
-              )}
+            )}
           </div>
         </div>
       </div>
