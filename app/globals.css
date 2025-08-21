@@ -4,24 +4,144 @@
 
 @layer base {
   html {
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-inter), system-ui, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-poppins), system-ui, sans-serif;
+  }
+  
+  /* Satoshi font support for logo */
+  .font-satoshi {
+    font-family: 'Satoshi', 'Satoshi Placeholder', sans-serif;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
   }
   
   .btn-secondary {
-    @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-300 border-2 border-gray-200 hover:border-gray-300;
   }
   
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+    @apply bg-white rounded-2xl shadow-lg border border-gray-100 p-8 hover:shadow-xl transition-all duration-300;
   }
   
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+  }
+  
+  .section-padding {
+    @apply py-20;
+  }
+  
+  .container-max {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent;
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-xl;
+  }
+  
+  /* Mindify-inspired centered layout utilities */
+  .mindify-center {
+    @apply w-full h-min flex flex-col justify-center items-center overflow-visible p-0 align-content-center flex-nowrap gap-0;
+  }
+  
+  .mindify-section {
+    @apply w-full flex flex-col justify-center items-center text-center;
+  }
+  
+  .mindify-content {
+    @apply max-w-4xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  .mindify-overlay {
+    @apply bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg;
+  }
+  
+  .mindify-badge {
+    @apply inline-block bg-primary-100 text-primary-700 text-sm font-semibold px-4 py-2 rounded-full;
+  }
+  
+  .mindify-grid {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-16 items-center;
+  }
+  
+  .mindify-text-content {
+    @apply flex flex-col justify-center;
+  }
+  
+  .mindify-image-container {
+    @apply relative;
+  }
+  
+  .mindify-image {
+    @apply bg-gradient-to-br from-primary-100 to-primary-200 rounded-3xl h-96 flex items-center justify-center relative overflow-hidden;
+  }
+  
+  /* Header styling from Framer code */
+  .header-backdrop {
+    @apply backdrop-blur-md bg-white/75 border-b border-gray-200/50;
+  }
+  
+  .header-content {
+    @apply flex justify-between items-center h-20;
+  }
+  
+  .header-logo {
+    @apply flex items-center;
+  }
+  
+  .header-nav {
+    @apply hidden md:flex items-center space-x-10;
+  }
+  
+  .header-nav-link {
+    @apply text-gray-700 hover:text-primary-600 transition-colors font-medium;
+  }
+  
+  .header-actions {
+    @apply flex items-center space-x-4;
+  }
+  
+  .header-signin {
+    @apply text-gray-700 hover:text-primary-600 transition-colors font-medium px-4 py-2;
+  }
+  
+  /* Backdrop blur utilities */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+  
+  .backdrop-blur-md {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  
+  .backdrop-blur-lg {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+  
+  /* Semi-transparent backgrounds */
+  .bg-white\/75 {
+    background-color: rgba(255, 255, 255, 0.75);
+  }
+  
+  .bg-white\/90 {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  
+  .border-gray-200\/50 {
+    border-color: rgba(229, 231, 235, 0.5);
   }
 }

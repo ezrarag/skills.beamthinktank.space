@@ -1,42 +1,18 @@
 -- Enable necessary extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Create tables for the skills training platform
-
 -- Users table (extends Supabase auth.users)
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   email TEXT UNIQUE NOT NULL,
-  full_name TEXT,
-  avatar_url TEXT,
-  bio TEXT,
+  first_name TEXT,
+  last_name TEXT,
+  phone TEXT,
+  emergency_contact TEXT,
+  emergency_phone TEXT,
+  special_needs TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Instructors table
-CREATE TABLE IF NOT EXISTS public.instructors (
-  id SERIAL PRIMARY KEY,
-  profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  bio TEXT,
-  expertise TEXT[],
-  avatar_url TEXT,
-  rating DECIMAL(3,2) DEFAULT 0,
-  total_students INTEGER DEFAULT 0,
-  company TEXT,
-  experience_years INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Categories table
-CREATE TABLE IF NOT EXISTS public.categories (
-  id SERIAL PRIMARY KEY,
-  name TEXT UNIQUE NOT NULL,
-  description TEXT,
-  color TEXT DEFAULT '#3B82F6',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Courses table
@@ -44,30 +20,41 @@ CREATE TABLE IF NOT EXISTS public.courses (
   id SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
-  category_id INTEGER REFERENCES public.categories(id),
-  instructor_id INTEGER REFERENCES public.instructors(id),
-  price DECIMAL(10,2) NOT NULL,
-  duration INTEGER NOT NULL, -- in hours
-  max_students INTEGER DEFAULT 50,
-  current_students INTEGER DEFAULT 0,
-  level TEXT CHECK (level IN ('Beginner', 'Intermediate', 'Advanced')),
-  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'draft')),
-  stripe_product_id TEXT,
-  stripe_price_id TEXT,
+  long_description TEXT,
+  category TEXT NOT NULL,
+  price TEXT DEFAULT 'Free (unlocked through community donations)',
+  duration TEXT NOT NULL,
+  total_hours INTEGER,
+  instructor TEXT NOT NULL,
+  level TEXT DEFAULT 'Beginner',
+  featured BOOLEAN DEFAULT false,
+  location TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
+  class_time TEXT NOT NULL,
+  max_students INTEGER DEFAULT 15,
+  enrolled_students INTEGER DEFAULT 0,
+  rating DECIMAL(3,2) DEFAULT 0.0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Course content table
-CREATE TABLE IF NOT EXISTS public.course_content (
+-- Course schedule table
+CREATE TABLE IF NOT EXISTS public.course_schedule (
   id SERIAL PRIMARY KEY,
   course_id INTEGER REFERENCES public.courses(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  content_type TEXT CHECK (content_type IN ('video', 'text', 'quiz', 'assignment')),
-  content TEXT,
-  video_url TEXT,
-  duration INTEGER, -- in minutes
-  order_index INTEGER DEFAULT 0,
+  week INTEGER NOT NULL,
+  topic TEXT NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Course requirements and outcomes
+CREATE TABLE IF NOT EXISTS public.course_requirements (
+  id SERIAL PRIMARY KEY,
+  course_id INTEGER REFERENCES public.courses(id) ON DELETE CASCADE,
+  requirement TEXT NOT NULL,
+  type TEXT DEFAULT 'requirement', -- 'requirement' or 'outcome'
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -76,177 +63,192 @@ CREATE TABLE IF NOT EXISTS public.enrollments (
   id SERIAL PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
   course_id INTEGER REFERENCES public.courses(id) ON DELETE CASCADE,
-  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'active', 'completed', 'cancelled')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'attended', 'cancelled')),
   enrolled_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  completed_at TIMESTAMP WITH TIME ZONE,
-  progress_percentage INTEGER DEFAULT 0,
-  stripe_session_id TEXT,
+  attended_at TIMESTAMP WITH TIME ZONE,
+  notes TEXT,
   UNIQUE(user_id, course_id)
 );
 
--- Certifications table
-CREATE TABLE IF NOT EXISTS public.certifications (
+-- Notifications table for SMS/email
+CREATE TABLE IF NOT EXISTS public.notifications (
   id SERIAL PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
   course_id INTEGER REFERENCES public.courses(id) ON DELETE CASCADE,
-  issued_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  expiry_date TIMESTAMP WITH TIME ZONE,
-  score INTEGER CHECK (score >= 0 AND score <= 100),
-  certificate_url TEXT,
-  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'expired', 'revoked')),
-  UNIQUE(user_id, course_id)
-);
-
--- Course schedules table
-CREATE TABLE IF NOT EXISTS public.course_schedules (
-  id SERIAL PRIMARY KEY,
-  course_id INTEGER REFERENCES public.courses(id) ON DELETE CASCADE,
-  start_date DATE NOT NULL,
-  start_time TIME NOT NULL,
-  end_time TIME NOT NULL,
-  location TEXT,
-  max_students INTEGER DEFAULT 25,
-  current_students INTEGER DEFAULT 0,
-  status TEXT DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'in_progress', 'completed', 'cancelled')),
+  type TEXT NOT NULL CHECK (type IN ('sms', 'email', 'both')),
+  message TEXT NOT NULL,
+  sent_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'sent', 'failed')),
+  twilio_sid TEXT, -- Store Twilio message SID for tracking
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- User progress table
-CREATE TABLE IF NOT EXISTS public.user_progress (
-  id SERIAL PRIMARY KEY,
-  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  course_id INTEGER REFERENCES public.courses(id) ON DELETE CASCADE,
-  content_id INTEGER REFERENCES public.course_content(id) ON DELETE CASCADE,
-  completed BOOLEAN DEFAULT FALSE,
-  completed_at TIMESTAMP WITH TIME ZONE,
-  score INTEGER,
-  time_spent INTEGER DEFAULT 0, -- in minutes
-  UNIQUE(user_id, content_id)
+-- Insert your two BEAM Skills courses
+INSERT INTO public.courses (
+  title, description, long_description, category, price, duration, total_hours,
+  instructor, level, featured, location, start_date, end_date, class_time, max_students
+) VALUES 
+(
+  'Intro to Tech for All Ages',
+  'Learn the basics of computers, phones, and the internet. Build confidence using email, Zoom, and everyday apps safely.',
+  'This comprehensive course is designed for learners of all ages who want to build confidence with modern technology. Whether you''re a senior looking to stay connected with family, a parent wanting to help your children with homework, or anyone who feels left behind by the digital world, this course will give you the skills you need to thrive in today''s connected society.',
+  'Technology',
+  'Free (unlocked through community donations)',
+  '6 weeks (1.5 hrs / session)',
+  9,
+  'BEAM Skills Volunteer Team',
+  'Beginner',
+  true,
+  'Community Center - Room A',
+  '2024-02-15',
+  '2024-03-28',
+  'Thursdays, 10:00 AM - 11:30 AM',
+  15
+),
+(
+  'Intro to Car Maintenance & Repair',
+  'Hands-on introduction to car systems, safety checks, and basic repair skills. Includes community service car clinic.',
+  'Get hands-on experience with car maintenance and repair in this practical course designed for beginners. Learn essential skills that will save you money and keep your vehicle running safely. The course includes both classroom learning and hands-on practice in our fully equipped auto shop. Plus, you''ll have the opportunity to participate in our community service car clinic, helping others while practicing your new skills.',
+  'Transportation',
+  'Free (unlocked through community donations)',
+  '8 weeks (2 hrs / session)',
+  16,
+  'BEAM Skills Volunteer Mechanics',
+  'Beginner',
+  true,
+  'Auto Shop - Bay 3',
+  '2024-02-16',
+  '2024-04-05',
+  'Fridays, 2:00 PM - 4:00 PM',
+  12
 );
 
--- Reviews table
-CREATE TABLE IF NOT EXISTS public.reviews (
-  id SERIAL PRIMARY KEY,
-  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
-  course_id INTEGER REFERENCES public.courses(id) ON DELETE CASCADE,
-  rating INTEGER CHECK (rating >= 1 AND rating <= 5),
-  comment TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  UNIQUE(user_id, course_id)
-);
+-- Insert course schedules
+INSERT INTO public.course_schedule (course_id, week, topic, description) VALUES
+-- Tech course schedule
+(1, 1, 'Computer Basics & Safety', 'Introduction to computers, basic operations, and internet safety'),
+(1, 2, 'Email & Communication', 'Setting up email, sending messages, and using communication apps'),
+(1, 3, 'Internet & Search', 'Safe web browsing, search engines, and finding reliable information'),
+(1, 4, 'Video Calls & Zoom', 'Making video calls, using Zoom, and staying connected virtually'),
+(1, 5, 'Mobile Devices', 'Smartphone basics, apps, and mobile internet safety'),
+(1, 6, 'Digital Security', 'Password management, privacy settings, and protecting your information'),
 
--- Insert default categories
-INSERT INTO public.categories (name, description, color) VALUES
-  ('Technology', 'Software development, programming, and technical skills', '#3B82F6'),
-  ('Data', 'Data science, analytics, and machine learning', '#10B981'),
-  ('Marketing', 'Digital marketing, SEO, and growth strategies', '#F59E0B'),
-  ('Design', 'UI/UX design, graphic design, and creative skills', '#8B5CF6'),
-  ('Business', 'Business strategy, management, and entrepreneurship', '#EF4444'),
-  ('Finance', 'Financial planning, investment, and accounting', '#06B6D4'),
-  ('Healthcare', 'Medical training and healthcare skills', '#84CC16')
-ON CONFLICT (name) DO NOTHING;
+-- Car maintenance course schedule
+(2, 1, 'Car Safety & Tools', 'Safety procedures, basic tools, and workshop orientation'),
+(2, 2, 'Engine Basics', 'Understanding how engines work and basic engine maintenance'),
+(2, 3, 'Oil & Fluids', 'Checking and changing oil, coolant, and other essential fluids'),
+(2, 4, 'Brake Systems', 'Brake inspection, maintenance, and basic repairs'),
+(2, 5, 'Tires & Wheels', 'Tire safety, rotation, and basic wheel maintenance'),
+(2, 6, 'Electrical Systems', 'Battery maintenance, lights, and basic electrical troubleshooting'),
+(2, 7, 'Preventive Maintenance', 'Regular maintenance schedules and DIY service tasks'),
+(2, 8, 'Community Service Clinic', 'Practice skills by helping others with their vehicles');
 
--- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_courses_category ON public.courses(category_id);
-CREATE INDEX IF NOT EXISTS idx_courses_instructor ON public.courses(instructor_id);
-CREATE INDEX IF NOT EXISTS idx_enrollments_user ON public.enrollments(user_id);
-CREATE INDEX IF NOT EXISTS idx_enrollments_course ON public.enrollments(course_id);
-CREATE INDEX IF NOT EXISTS idx_certifications_user ON public.certifications(user_id);
-CREATE INDEX IF NOT EXISTS idx_user_progress_user ON public.user_progress(user_id);
-CREATE INDEX IF NOT EXISTS idx_reviews_course ON public.reviews(course_id);
+-- Insert course requirements and outcomes
+INSERT INTO public.course_requirements (course_id, requirement, type) VALUES
+-- Tech course requirements
+(1, 'No prior computer experience required', 'requirement'),
+(1, 'Access to a computer or smartphone (we can help arrange if needed)', 'requirement'),
+(1, 'Willingness to learn and ask questions', 'requirement'),
+(1, 'Basic reading and writing skills', 'requirement'),
 
--- Enable Row Level Security (RLS)
+-- Tech course outcomes
+(1, 'Confidently use computers and mobile devices', 'outcome'),
+(1, 'Send emails and make video calls', 'outcome'),
+(1, 'Safely browse the internet', 'outcome'),
+(1, 'Use common apps and software', 'outcome'),
+(1, 'Protect your personal information online', 'outcome'),
+
+-- Car course requirements
+(2, 'No prior automotive experience required', 'requirement'),
+(2, 'Comfortable working with tools and getting hands dirty', 'requirement'),
+(2, 'Closed-toe shoes and appropriate work clothing', 'requirement'),
+(2, 'Basic math and reading skills', 'requirement'),
+
+-- Car course outcomes
+(2, 'Perform basic car maintenance and safety checks', 'outcome'),
+(2, 'Change oil and other fluids', 'outcome'),
+(2, 'Inspect and maintain brake systems', 'outcome'),
+(2, 'Rotate tires and perform basic wheel maintenance', 'outcome'),
+(2, 'Troubleshoot common car problems', 'outcome'),
+(2, 'Understand when to seek professional help', 'outcome');
+
+-- Row Level Security (RLS) policies
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.instructors ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.course_content ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.course_schedule ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.course_requirements ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.enrollments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.certifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.course_schedules ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.user_progress ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies
--- Profiles: Users can only see and edit their own profile
+-- Profiles: Users can only see/edit their own profile
 CREATE POLICY "Users can view own profile" ON public.profiles
   FOR SELECT USING (auth.uid() = id);
 
 CREATE POLICY "Users can update own profile" ON public.profiles
   FOR UPDATE USING (auth.uid() = id);
 
--- Courses: Public read access, instructors can edit their courses
+CREATE POLICY "Users can insert own profile" ON public.profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- Courses: Everyone can view courses
 CREATE POLICY "Anyone can view courses" ON public.courses
   FOR SELECT USING (true);
 
-CREATE POLICY "Instructors can edit their courses" ON public.courses
-  FOR UPDATE USING (
-    EXISTS (
-      SELECT 1 FROM public.instructors 
-      WHERE id = courses.instructor_id 
-      AND profile_id = auth.uid()
-    )
-  );
+-- Course schedule: Everyone can view
+CREATE POLICY "Anyone can view course schedule" ON public.course_schedule
+  FOR SELECT USING (true);
+
+-- Course requirements: Everyone can view
+CREATE POLICY "Anyone can view course requirements" ON public.course_requirements
+  FOR SELECT USING (true);
 
 -- Enrollments: Users can only see their own enrollments
 CREATE POLICY "Users can view own enrollments" ON public.enrollments
   FOR SELECT USING (auth.uid() = user_id);
 
-CREATE POLICY "Users can create enrollments" ON public.enrollments
+CREATE POLICY "Users can insert own enrollments" ON public.enrollments
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
--- Certifications: Users can only see their own certifications
-CREATE POLICY "Users can view own certifications" ON public.certifications
+-- Notifications: Users can only see their own notifications
+CREATE POLICY "Users can view own notifications" ON public.notifications
   FOR SELECT USING (auth.uid() = user_id);
 
--- Reviews: Public read access, users can only edit their own reviews
-CREATE POLICY "Anyone can view reviews" ON public.reviews
-  FOR SELECT USING (true);
-
-CREATE POLICY "Users can create reviews" ON public.reviews
-  FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own reviews" ON public.reviews
-  FOR UPDATE USING (auth.uid() = user_id);
-
--- Functions and triggers
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ language 'plpgsql';
-
--- Create triggers for updated_at columns
-CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON public.profiles
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_instructors_updated_at BEFORE UPDATE ON public.instructors
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
-CREATE TRIGGER update_courses_updated_at BEFORE UPDATE ON public.courses
-  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- Function to update course student count
-CREATE OR REPLACE FUNCTION update_course_student_count()
+-- Function to update course enrollment count
+CREATE OR REPLACE FUNCTION update_course_enrollment()
 RETURNS TRIGGER AS $$
 BEGIN
   IF TG_OP = 'INSERT' THEN
     UPDATE public.courses 
-    SET current_students = current_students + 1 
+    SET enrolled_students = enrolled_students + 1 
     WHERE id = NEW.course_id;
     RETURN NEW;
   ELSIF TG_OP = 'DELETE' THEN
     UPDATE public.courses 
-    SET current_students = current_students - 1 
+    SET enrolled_students = enrolled_students - 1 
     WHERE id = OLD.course_id;
     RETURN OLD;
   END IF;
   RETURN NULL;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
--- Create trigger for student count updates
-CREATE TRIGGER update_course_student_count_trigger
+-- Trigger to automatically update enrollment counts
+CREATE TRIGGER trigger_update_course_enrollment
   AFTER INSERT OR DELETE ON public.enrollments
-  FOR EACH ROW EXECUTE FUNCTION update_course_student_count();
+  FOR EACH ROW
+  EXECUTE FUNCTION update_course_enrollment();
+
+-- Function to create profile on user signup
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, email)
+  VALUES (NEW.id, NEW.email);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Trigger to create profile when user signs up
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
