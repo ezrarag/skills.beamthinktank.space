@@ -303,9 +303,9 @@ export default function CoursesPage() {
   const [sortBy, setSortBy] = useState('rating')
   const [priceFilter, setPriceFilter] = useState(['Free (Community Funded)', 'Sponsored Programs'])
   const [levelFilter, setLevelFilter] = useState(['Beginner', 'Intermediate', 'Advanced'])
-  const [expandedCard, setExpandedCard] = useState(null)
+  const [expandedCard, setExpandedCard] = useState<number | null>(null)
   const [isSkillsDropdownOpen, setIsSkillsDropdownOpen] = useState(false)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<any>(null)
   const [enrolledCourses, setEnrolledCourses] = useState<number[]>([])
   const [enrolling, setEnrolling] = useState<number | null>(null)
   const [showToast, setShowToast] = useState(false)
@@ -408,7 +408,7 @@ export default function CoursesPage() {
     }
   }
 
-  const handlePriceFilterChange = (price) => {
+  const handlePriceFilterChange = (price: string) => {
     setPriceFilter(prev => 
       prev.includes(price) 
         ? prev.filter(p => p !== price)
@@ -416,7 +416,7 @@ export default function CoursesPage() {
     )
   }
 
-  const handleLevelFilterChange = (level) => {
+  const handleLevelFilterChange = (level: string) => {
     setLevelFilter(prev => 
       prev.includes(level) 
         ? prev.filter(l => l !== level)
@@ -424,7 +424,7 @@ export default function CoursesPage() {
     )
   }
 
-  const toggleCardExpansion = (courseId) => {
+  const toggleCardExpansion = (courseId: number) => {
     setExpandedCard(expandedCard === courseId ? null : courseId)
   }
 

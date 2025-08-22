@@ -13,6 +13,9 @@ interface Course {
   instructor: string
   max_students: number
   enrolled_students: number
+  duration: string
+  class_time: string
+  location: string
 }
 
 interface Enrollment {

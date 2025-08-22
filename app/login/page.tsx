@@ -73,14 +73,13 @@ export default function LoginPage() {
       </div>
 
       {/* Toast Notification */}
-      {showToast && (
-        <Toast
-          message="Successfully signed in! Redirecting to your dashboard..."
-          type="success"
-          duration={2000}
-          onClose={() => setShowToast(false)}
-        />
-      )}
+      <Toast
+        message="Successfully signed in! Redirecting to your dashboard..."
+        type="success"
+        duration={2000}
+        onClose={() => setShowToast(false)}
+        isVisible={showToast}
+      />
     </div>
   )
 }

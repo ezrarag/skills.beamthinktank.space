@@ -21,7 +21,7 @@ interface SetupGuideProps {
   onDataUpdate?: () => void
 }
 
-export default function SetupGuide({ isOpen, onClose, userId }: SetupGuideProps) {
+export default function SetupGuide({ isOpen, onClose, userId, onDataUpdate }: SetupGuideProps) {
   const [tasks, setTasks] = useState<SetupTask[]>([])
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
@@ -189,7 +189,9 @@ export default function SetupGuide({ isOpen, onClose, userId }: SetupGuideProps)
       })
       
       // Notify parent component to refresh data
-      onDataUpdate?.()
+      if (onDataUpdate) {
+        onDataUpdate()
+      }
       
       // Show success message
       setShowSuccess(true)

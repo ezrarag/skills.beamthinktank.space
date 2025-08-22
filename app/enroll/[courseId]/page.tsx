@@ -181,14 +181,13 @@ export default function EnrollmentPage({ params }: { params: { courseId: string 
       </div>
 
       {/* Toast Notification */}
-      {showToast && (
-        <Toast
-          message={toastMessage}
-          type={toastType}
-          duration={4000}
-          onClose={() => setShowToast(false)}
-        />
-      )}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        duration={4000}
+        onClose={() => setShowToast(false)}
+        isVisible={showToast}
+      />
     </div>
   )
 }
@@ -473,14 +472,13 @@ export default function EnrollmentPage({ params }: { params: { courseId: string 
       </div>
 
       {/* Toast Notification */}
-      {showToast && (
-        <Toast
-          message={toastMessage}
-          type={toastType}
-          duration={4000}
-          onClose={() => setShowToast(false)}
-        />
-      )}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        duration={4000}
+        onClose={() => setShowToast(false)}
+        isVisible={showToast}
+      />
     </div>
   )
 }
