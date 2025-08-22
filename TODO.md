@@ -1,4 +1,10 @@
-# TODO - BEAM Skills Training Site
+# TODO
+
+## Course Management
+- [ ] Implement dynamic spots remaining display on enroll page
+  - Only show when enrolled students reach certain threshold
+  - Calculate available spots based on max_students vs enrolled_students
+  - Hide spots remaining for courses with low enrollment - BEAM Skills Training Site
 
 ## ✅ COMPLETED ITEMS
 

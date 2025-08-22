@@ -1,0 +1,961 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
+import { supabase } from '@/lib/supabase'
+import SetupGuide from '../components/SetupGuide'
+import { 
+  Brain, 
+  BookOpen, 
+  Users, 
+  Calendar, 
+  Award, 
+  LogIn, 
+  UserPlus, 
+  Hammer,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  MapPin,
+  Star,
+  TrendingUp,
+  Target,
+  CheckCircle,
+  PlayCircle,
+  BarChart3,
+  FileText,
+  Settings,
+  User,
+  Bell,
+  Search,
+  HelpCircle
+} from 'lucide-react'
+
+// Course data for reference (this will be fetched from Supabase)
+const coursesData = [
+  {
+    id: 1,
+    title: "Intro to Tech for All Ages",
+    instructor: "BEAM Skills Volunteer Team",
+    duration: "6 weeks (1.5 hrs / session)",
+    category: "Technology",
+    location: "Community Center - Room A",
+    startDate: "2024-02-15",
+    endDate: "2024-03-28",
+    classTime: "Thursdays, 10:00 AM - 11:30 AM"
+  },
+  {
+    id: 2,
+    title: "Intro to Car Maintenance & Repair",
+    instructor: "BEAM Skills Volunteer Mechanics",
+    duration: "8 weeks (2 hrs / session)",
+    category: "Transportation",
+    location: "Auto Shop - Bay 3",
+    startDate: "2024-02-16",
+    endDate: "2024-04-05",
+    classTime: "Fridays, 2:00 PM - 4:00 PM"
+  },
+  {
+    id: 3,
+    title: "Orchestra Repertoire for Beginners",
+    instructor: "BEAM Skills Music Volunteers",
+    duration: "16 weeks (1.5 hrs / session)",
+    category: "Arts & Music",
+    location: "Library - Music Room",
+    startDate: "2024-02-17",
+    endDate: "2024-06-08",
+    classTime: "Saturdays, 1:00 PM - 2:30 PM"
+  },
+  {
+    id: 13,
+    title: "Fabrication & Product Design",
+    instructor: "Product Design Engineer / Fabrication Specialist",
+    duration: "14 weeks (2.5 hrs / session)",
+    category: "Manufacturing",
+    location: "BEAM Innovation Lab",
+    startDate: "2024-09-20",
+    endDate: "2024-12-27",
+    classTime: "Fridays, 6:00 PM - 8:30 PM"
+  },
+  {
+    id: 14,
+    title: "Automotive Design & Fabrication",
+    instructor: "Automotive Engineer / Fabrication Expert",
+    duration: "16 weeks (3 hrs / session)",
+    category: "Transportation Innovation",
+    location: "BEAM Automotive Workshop",
+    startDate: "2024-09-21",
+    endDate: "2025-01-11",
+    classTime: "Saturdays, 9:00 AM - 12:00 PM"
+  },
+  {
+    id: 15,
+    title: "Juice & Food Manufacturing",
+    instructor: "Food Safety Specialist / Manufacturing Expert",
+    duration: "12 weeks (2 hrs / session)",
+    category: "Manufacturing",
+    location: "BEAM Food Lab",
+    startDate: "2024-09-22",
+    endDate: "2024-12-15",
+    classTime: "Sundays, 2:00 PM - 4:00 PM"
+  }
+]
+
+// Mock achievements
+const achievements = [
+  {
+    id: 1,
+    title: "First Steps",
+    description: "Completed your first course",
+    icon: "🎯",
+    unlocked: true,
+    unlockedDate: "2024-02-05"
+  },
+  {
+    id: 2,
+    title: "Tech Explorer",
+    description: "Completed a technology course",
+    icon: "💻",
+    unlocked: true,
+    unlockedDate: "2024-02-05"
+  },
+  {
+    id: 3,
+    title: "Week Warrior",
+    description: "Attended 5 sessions in a week",
+    icon: "🔥",
+    unlocked: false
+  },
+  {
+    id: 4,
+    title: "Community Builder",
+    description: "Participated in 3 different course categories",
+    icon: "🏗️",
+    unlocked: false
+  }
+]
+
+export default function DashboardPage() {
+  const [isSkillsDropdownOpen, setIsSkillsDropdownOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('overview')
+  const [userData, setUserData] = useState<any>(null)
+  const [enrolledCourses, setEnrolledCourses] = useState<any[]>([])
+  const [upcomingSessions, setUpcomingSessions] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isSetupGuideOpen, setIsSetupGuideOpen] = useState(false)
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data: { user }, error } = await supabase.auth.getUser()
+        if (user) {
+          // Fetch user profile
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+
+          // Check for pending course enrollment from before login
+          const pendingCourseId = localStorage.getItem('pendingCourseEnrollment')
+          console.log('Pending course ID:', pendingCourseId) // Debug log
+          
+          if (pendingCourseId) {
+            try {
+              console.log('Creating enrollment for course:', pendingCourseId) // Debug log
+              
+              // Create enrollment for the course that was selected before login
+              const { data: enrollment, error: enrollError } = await supabase
+                .from('enrollments')
+                .insert({
+                  user_id: user.id,
+                  course_id: parseInt(pendingCourseId),
+                  status: 'pending',
+                  attendance_mode: 'in-person'
+                })
+                .select()
+                .single()
+              
+              if (enrollError) {
+                console.error('Enrollment error:', enrollError) // Debug log
+              } else if (enrollment) {
+                console.log('Enrollment created successfully:', enrollment) // Debug log
+                // Clear the pending enrollment from localStorage
+                localStorage.removeItem('pendingCourseEnrollment')
+              }
+            } catch (enrollError) {
+              console.error('Error creating initial enrollment:', enrollError)
+            }
+          }
+
+          // Fetch all enrollments
+          const { data: enrollments, error: enrollmentsError } = await supabase
+            .from('enrollments')
+            .select(`
+              *,
+              courses (
+                id,
+                title,
+                instructor,
+                duration,
+                category,
+                location,
+                start_date,
+                end_date,
+                class_time
+              )
+            `)
+            .eq('user_id', user.id)
+            .in('status', ['confirmed', 'pending'])
+          
+          if (enrollmentsError) {
+            console.error('Error fetching enrollments:', enrollmentsError) // Debug log
+          } else {
+            console.log('Fetched enrollments:', enrollments) // Debug log
+          }
+
+          if (enrollments) {
+            console.log('Processing enrollments:', enrollments) // Debug log
+            
+            const courses = enrollments.map(enrollment => {
+              const course = enrollment.courses
+              console.log('Processing course:', course) // Debug log
+              
+              return {
+                id: course.id,
+                title: course.title,
+                instructor: course.instructor,
+                progress: Math.floor(Math.random() * 100), // Mock progress for now
+                nextSession: course.start_date,
+                nextSessionTime: course.class_time,
+                location: course.location,
+                category: course.category,
+                status: 'in-progress',
+                lastAccessed: new Date().toISOString().split('T')[0]
+              }
+            })
+            
+            console.log('Processed courses:', courses) // Debug log
+            setEnrolledCourses(courses)
+            
+            // Generate upcoming sessions
+            const sessions = courses.map(course => ({
+              id: course.id,
+              course: course.title,
+              date: course.nextSession,
+              time: course.nextSessionTime,
+              location: course.location,
+              instructor: course.instructor
+            }))
+            setUpcomingSessions(sessions)
+          } else {
+            console.log('No enrollments found') // Debug log
+            
+            // If no enrollments and we have a pending course, try to create it again
+            if (pendingCourseId) {
+              console.log('Attempting to create enrollment again for course:', pendingCourseId) // Debug log
+              try {
+                const { data: testEnrollment, error: testError } = await supabase
+                  .from('enrollments')
+                  .insert({
+                    user_id: user.id,
+                    course_id: parseInt(pendingCourseId),
+                    status: 'pending',
+                    attendance_mode: 'in-person'
+                  })
+                  .select()
+                  .single()
+                
+                if (testError) {
+                  console.error('Test enrollment error:', testError) // Debug log
+                } else if (testEnrollment) {
+                  console.log('Test enrollment created:', testEnrollment) // Debug log
+                  // Refresh enrollments
+                  const { data: refreshedEnrollments } = await supabase
+                    .from('enrollments')
+                    .select(`
+                      *,
+                      courses (
+                        id,
+                        title,
+                        instructor,
+                        duration,
+                        category,
+                        location,
+                        start_date,
+                        end_date,
+                        class_time
+                      )
+                    `)
+                    .eq('user_id', user.id)
+                    .in('status', ['confirmed', 'pending'])
+                  
+                  if (refreshedEnrollments) {
+                    console.log('Refreshed enrollments:', refreshedEnrollments) // Debug log
+                    // Process the refreshed enrollments
+                    const courses = refreshedEnrollments.map(enrollment => {
+                      const course = enrollment.courses
+                      return {
+                        id: course.id,
+                        title: course.title,
+                        instructor: course.instructor,
+                        progress: Math.floor(Math.random() * 100),
+                        nextSession: course.start_date,
+                        nextSessionTime: course.class_time,
+                        location: course.location,
+                        category: course.category,
+                        status: 'in-progress',
+                        lastAccessed: new Date().toISOString().split('T')[0]
+                      }
+                    })
+                    setEnrolledCourses(courses)
+                    setUpcomingSessions(courses.map(course => ({
+                      id: course.id,
+                      course: course.title,
+                      date: course.nextSession,
+                      time: course.nextSessionTime,
+                      location: course.location,
+                      instructor: course.instructor
+                    })))
+                  }
+                }
+              } catch (testError) {
+                console.error('Error in test enrollment:', testError) // Debug log
+              }
+            }
+          }
+
+          // Set user data
+          setUserData({
+            id: user.id, // Add user ID for setup guide
+            name: profile?.first_name && profile?.last_name 
+              ? `${profile.first_name} ${profile.last_name}` 
+              : user.email?.split('@')[0] || 'User',
+            email: user.email,
+            avatar: profile?.avatar_url,
+            joinDate: user.created_at,
+            totalCourses: enrollments?.length || 0,
+            completedCourses: 0, // TODO: Implement completion logic
+            inProgressCourses: enrollments?.length || 0,
+            totalHours: (enrollments?.length || 0) * 2, // Rough estimate
+            certificationCount: 0, // TODO: Implement certification logic
+            currentStreak: Math.floor(Math.random() * 10) + 1, // Mock for now
+            totalPoints: (enrollments?.length || 0) * 150 // Mock points
+          })
+          
+          console.log('User data set:', {
+            totalCourses: enrollments?.length || 0,
+            enrolledCourses: enrollments
+          }) // Debug log
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchUserData()
+  }, [])
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isSettingsOpen) {
+        setIsSettingsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isSettingsOpen])
+
+  const toggleSkillsDropdown = () => {
+    setIsSkillsDropdownOpen(!isSkillsDropdownOpen)
+  }
+
+  const closeSkillsDropdown = () => {
+    setIsSkillsDropdownOpen(false)
+  }
+
+  const getProgressColor = (progress: number) => {
+    if (progress >= 80) return 'text-green-600'
+    if (progress >= 60) return 'text-yellow-600'
+    if (progress >= 40) return 'text-orange-600'
+    return 'text-red-600'
+  }
+
+  const getProgressBarColor = (progress: number) => {
+    if (progress >= 80) return 'bg-green-500'
+    if (progress >= 60) return 'bg-yellow-500'
+    if (progress >= 40) return 'bg-orange-500'
+    return 'bg-red-500'
+  }
+
+  const getSetupProgress = () => {
+    if (!userData) return 0
+    
+    let completed = 0
+    let total = 5 // Total setup tasks
+    
+    // Check profile completion (has real name, not just email)
+    if (userData.name && userData.name !== userData.email?.split('@')[0]) completed++
+    
+    // Check phone number (we'll need to get this from profile)
+    // For now, assume not completed
+    
+    // Check emergency contact (we'll need to get this from profile)
+    // For now, assume not completed
+    
+    // Check course enrollment
+    if (enrolledCourses.length > 0) completed++
+    
+    // Check attendance mode (has non-default attendance mode)
+    const hasCustomAttendanceMode = enrolledCourses.some(course => 
+      course.attendanceMode && course.attendanceMode !== 'in-person'
+    )
+    if (hasCustomAttendanceMode) completed++
+    
+    return Math.round((completed / total) * 100)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-lg text-gray-600">Loading your dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!userData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Not signed in</h2>
+          <p className="text-gray-600 mb-6">Please sign in to access your dashboard.</p>
+          <Link href="/login" className="btn-primary">
+            Sign In
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-gradient-to-br from-[#7A3B3B] to-[#6A2B2B] text-white py-20">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="flex justify-center items-center mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold mb-0 mr-6 font-satoshi">Dashboard</h1>
+            
+            {/* Skills Dropdown Button */}
+            <div className="relative">
+              <motion.button
+                onClick={toggleSkillsDropdown}
+                className="flex items-center space-x-2 bg-white/20 hover:bg-white/30 text-white font-medium px-6 py-3 rounded-full transition-all duration-300 backdrop-blur-sm"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Hammer className="h-5 w-5" />
+                <span className="font-satoshi">Dashboard</span>
+                <motion.div
+                  animate={{ rotate: isSkillsDropdownOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronDown className="h-5 w-5" />
+                </motion.div>
+              </motion.button>
+
+              {/* Skills Dropdown Menu */}
+              <AnimatePresence>
+                {isSkillsDropdownOpen && (
+                  <>
+                    {/* Backdrop */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 z-40"
+                      onClick={closeSkillsDropdown}
+                    />
+                    
+                    {/* Dropdown Content */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 py-2 z-50"
+                    >
+                      {/* Navigation Links */}
+                      <div className="px-4 py-2">
+                        <Link 
+                          href="/courses" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <BookOpen className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Courses</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/instructors" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Users className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Instructors</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/schedule" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Calendar className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Schedule</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/certifications" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Award className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Certifications</span>
+                        </Link>
+                      </div>
+                      
+                      {/* Divider */}
+                      <div className="border-t border-gray-200 my-2" />
+                      
+                      {/* Auth Links */}
+                      <div className="px-4 py-2">
+                        <button
+                          onClick={async () => {
+                            await supabase.auth.signOut()
+                            window.location.href = '/'
+                          }}
+                          className="w-full flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                        >
+                          <LogIn className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Sign Out</span>
+                        </button>
+                        
+                        <Link 
+                          href="/profile" 
+                          className="flex items-center space-x-3 px-3 py-3 text-[#7A3B3B] hover:text-[#6A2B2B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <UserPlus className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Profile</span>
+                        </Link>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+          
+          <p className="text-xl text-white/90 max-w-3xl mx-auto font-satoshi">
+            Track your progress, manage your courses, and celebrate your achievements
+          </p>
+        </div>
+      </div>
+
+      <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        {/* User Profile Section */}
+        <div className="card mb-8">
+          <div className="flex items-center space-x-6">
+            <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center">
+              {userData.avatar ? (
+                <img src={userData.avatar} alt={userData.name} className="w-full h-full rounded-full object-cover" />
+              ) : (
+                <User className="h-10 w-10 text-primary-600" />
+              )}
+            </div>
+            <div className="flex-1">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{userData.name}</h2>
+              <p className="text-gray-600 mb-2">{userData.email}</p>
+              <p className="text-sm text-gray-500">Member since {new Date(userData.joinDate).toLocaleDateString()}</p>
+            </div>
+                        <div className="flex items-center space-x-4">
+                        {/* Setup Guide Button */}
+          {!isSetupGuideOpen && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              onClick={() => setIsSetupGuideOpen(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-all duration-200 font-medium"
+            >
+              <HelpCircle className="h-4 w-4" />
+              <span>Setup Guide</span>
+              <div className="relative w-6 h-6">
+                <svg className="w-6 h-6 transform -rotate-90" viewBox="0 0 36 36">
+                  <path
+                    className="text-gray-300"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <path
+                    className="text-primary-600"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    fill="none"
+                    strokeDasharray="100, 100"
+                    strokeDashoffset={100 - (getSetupProgress() * 100) / 100}
+                    d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                </svg>
+              </div>
+            </motion.button>
+          )}
+          
+          {/* Test Enrollment Button (temporary) */}
+          <button
+            onClick={async () => {
+              const testCourseId = '13'
+              localStorage.setItem('pendingCourseEnrollment', testCourseId)
+              console.log('Test course ID set:', testCourseId)
+              // Refresh the page to test the flow
+              window.location.reload()
+            }}
+            className="px-3 py-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm font-medium transition-colors"
+          >
+            Test Course 13
+          </button>
+              
+              <button className="p-3 hover:bg-gray-100 rounded-full transition-colors">
+                <Bell className="h-6 w-6 text-gray-600" />
+              </button>
+              
+              <div className="relative">
+                <button 
+                  onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                  className="p-3 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <Settings className="h-6 w-6 text-gray-600" />
+                </button>
+                {/* Settings Dropdown */}
+                {isSettingsOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                    <button
+                      onClick={async () => {
+                        await supabase.auth.signOut()
+                        window.location.href = '/'
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="card text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <BookOpen className="h-8 w-8 text-blue-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">{userData.totalCourses}</h3>
+            <p className="text-gray-600">Total Courses</p>
+          </div>
+          
+          <div className="card text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">{userData.completedCourses}</h3>
+            <p className="text-gray-600">Completed</p>
+          </div>
+          
+          <div className="card text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-yellow-100 to-yellow-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Clock className="h-8 w-8 text-yellow-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">{userData.totalHours}h</h3>
+            <p className="text-gray-600">Total Hours</p>
+          </div>
+          
+          <div className="card text-center">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Award className="h-8 w-8 text-purple-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">{userData.certificationCount}</h3>
+            <p className="text-gray-600">Certifications</p>
+          </div>
+        </div>
+
+        {/* Main Content Tabs */}
+        <div className="card">
+          {/* Tab Navigation */}
+          <div className="border-b border-gray-200 mb-8">
+            <nav className="flex space-x-8">
+              {[
+                { id: 'overview', label: 'Overview', icon: BarChart3 },
+                { id: 'courses', label: 'My Courses', icon: BookOpen },
+                { id: 'schedule', label: 'Upcoming Sessions', icon: Calendar },
+                { id: 'achievements', label: 'Achievements', icon: Award }
+              ].map((tab) => {
+                const Icon = tab.icon
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                      activeTab === tab.id
+                        ? 'border-primary-500 text-primary-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span>{tab.label}</span>
+                  </button>
+                )
+              })}
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          <div className="min-h-[400px]">
+            {activeTab === 'overview' && (
+              <div className="space-y-8">
+                {/* Progress Chart */}
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Learning Progress</h3>
+                  <div className="bg-gradient-to-r from-primary-50 to-primary-100 rounded-2xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-lg font-medium text-primary-700">Overall Progress</span>
+                      <span className="text-2xl font-bold text-primary-700">
+                        {Math.round((userData.completedCourses / userData.totalCourses) * 100)}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-white rounded-full h-4">
+                      <div 
+                        className="bg-primary-500 h-4 rounded-full transition-all duration-500"
+                        style={{ width: `${(userData.completedCourses / userData.totalCourses) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Activity */}
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h3>
+                  <div className="space-y-4">
+                    {enrolledCourses.slice(0, 3).map((course) => (
+                      <div key={course.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-xl">
+                        <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
+                          <BookOpen className="h-6 w-6 text-primary-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900">{course.title}</h4>
+                          <p className="text-sm text-gray-600">
+                            Last accessed {new Date(course.lastAccessed).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className={`font-bold ${getProgressColor(course.progress)}`}>
+                            {course.progress}%
+                          </div>
+                          <div className="text-sm text-gray-500">Complete</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'courses' && (
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">My Enrolled Courses</h3>
+                {enrolledCourses.map((course) => (
+                  <div key={course.id} className="border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-xl font-bold text-gray-900">{course.title}</h4>
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            course.status === 'completed' 
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-blue-100 text-blue-700'
+                          }`}>
+                            {course.status === 'completed' ? 'Completed' : 'In Progress'}
+                          </span>
+                        </div>
+                        
+                        <p className="text-gray-600 mb-4">with {course.instructor}</p>
+                        
+                        <div className="flex items-center space-x-6 mb-4">
+                          <div className="flex items-center text-gray-600">
+                            <MapPin className="h-5 w-5 text-primary-600 mr-2" />
+                            <span>{course.location}</span>
+                          </div>
+                          <div className="flex items-center text-gray-600">
+                            <Clock className="h-5 w-5 text-primary-600 mr-2" />
+                            <span>{course.nextSession ? `Next: ${new Date(course.nextSession).toLocaleDateString()}` : 'Course completed'}</span>
+                          </div>
+                        </div>
+                        
+                        {/* Progress Bar */}
+                        <div className="mb-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-gray-700">Progress</span>
+                            <span className={`text-sm font-bold ${getProgressColor(course.progress)}`}>
+                              {course.progress}%
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-3">
+                            <div 
+                              className={`h-3 rounded-full transition-all duration-500 ${getProgressBarColor(course.progress)}`}
+                              style={{ width: `${course.progress}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col space-y-3">
+                        <Link 
+                          href={`/courses/${course.id}`}
+                          className="btn-secondary text-center"
+                        >
+                          View Course
+                        </Link>
+                        {course.status !== 'completed' && (
+                          <Link 
+                            href={`/enroll/${course.id}`}
+                            className="btn-primary text-center"
+                          >
+                            Continue Learning
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {activeTab === 'schedule' && (
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Upcoming Sessions</h3>
+                {upcomingSessions.length > 0 ? (
+                  upcomingSessions.map((session) => (
+                    <div key={session.id} className="border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="text-xl font-bold text-gray-900 mb-2">{session.course}</h4>
+                          <div className="flex items-center space-x-6 text-gray-600">
+                            <div className="flex items-center">
+                              <Calendar className="h-5 w-5 text-primary-600 mr-2" />
+                              <span>{new Date(session.date).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <Clock className="h-5 w-5 text-primary-600 mr-2" />
+                              <span>{session.time}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <MapPin className="h-5 w-5 text-primary-600 mr-2" />
+                              <span>{session.location}</span>
+                            </div>
+                          </div>
+                          <p className="text-gray-600 mt-2">Instructor: {session.instructor}</p>
+                        </div>
+                        <div className="flex flex-col space-y-3">
+                          <button className="btn-primary">
+                            Join Session
+                          </button>
+                          <button className="btn-secondary">
+                            Add to Calendar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <Calendar className="h-20 w-20 text-gray-400 mx-auto mb-4" />
+                    <h4 className="text-xl font-semibold text-gray-900 mb-2">No upcoming sessions</h4>
+                    <p className="text-gray-600 mb-6">You don't have any upcoming sessions scheduled.</p>
+                    <Link href="/courses" className="btn-primary">
+                      Browse Courses
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'achievements' && (
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Achievements</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {achievements.map((achievement) => (
+                    <div 
+                      key={achievement.id} 
+                      className={`border-2 rounded-2xl p-6 text-center transition-all duration-300 ${
+                        achievement.unlocked 
+                          ? 'border-green-200 bg-green-50' 
+                          : 'border-gray-200 bg-gray-50'
+                      }`}
+                    >
+                      <div className={`text-4xl mb-4 ${achievement.unlocked ? 'opacity-100' : 'opacity-30'}`}>
+                        {achievement.icon}
+                      </div>
+                      <h4 className={`text-lg font-bold mb-2 ${
+                        achievement.unlocked ? 'text-green-700' : 'text-gray-500'
+                      }`}>
+                        {achievement.title}
+                      </h4>
+                      <p className={`text-sm mb-3 ${
+                        achievement.unlocked ? 'text-green-600' : 'text-gray-400'
+                      }`}>
+                        {achievement.description}
+                      </p>
+                      {achievement.unlocked ? (
+                        <div className="text-xs text-green-600 font-medium">
+                          Unlocked {new Date(achievement.unlockedDate).toLocaleDateString()}
+                        </div>
+                      ) : (
+                        <div className="text-xs text-gray-400">
+                          Locked
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      {/* Setup Guide */}
+      <SetupGuide
+        isOpen={isSetupGuideOpen}
+        onClose={() => setIsSetupGuideOpen(false)}
+        userId={userData?.id || ''}
+        onDataUpdate={() => {
+          // Refresh user data when setup guide updates something
+          fetchUserData()
+        }}
+      />
+    </div>
+  )
+}

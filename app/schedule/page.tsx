@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, Clock, Users, MapPin, Filter, ChevronLeft, ChevronRight, Heart, ArrowRight, ChevronDown, ChevronUp, Brain, BookOpen, Award, LogIn, UserPlus, Hammer } from 'lucide-react'
+import { Calendar, Clock, Users, MapPin, Filter, ChevronLeft, ChevronRight, Heart, ArrowRight, ChevronDown, ChevronUp, Brain, BookOpen, Award, LogIn, UserPlus, Hammer, BarChart3 } from 'lucide-react'
 
 const scheduleData = [
   {
@@ -185,16 +185,62 @@ const scheduleData = [
     price: "Free (unlocked through community donations)",
     featured: false,
     courseId: 12
+  },
+  {
+    id: 13,
+    course: "Fabrication & Product Design",
+    instructor: "Product Design Engineer / Fabrication Specialist",
+    date: "2024-09-20",
+    time: "6:00 PM - 8:30 PM",
+    duration: 2.5,
+    location: "BEAM Innovation Lab",
+    maxStudents: 12,
+    enrolledStudents: 0,
+    category: "Manufacturing",
+    price: "Free (unlocked through community donations)",
+    featured: true,
+    courseId: 13
+  },
+  {
+    id: 14,
+    course: "Automotive Design & Fabrication",
+    instructor: "Automotive Engineer / Fabrication Expert",
+    date: "2024-09-21",
+    time: "9:00 AM - 12:00 PM",
+    duration: 3,
+    location: "BEAM Automotive Workshop",
+    maxStudents: 10,
+    enrolledStudents: 0,
+    category: "Transportation Innovation",
+    price: "Free (unlocked through community donations)",
+    featured: true,
+    courseId: 14
+  },
+  {
+    id: 15,
+    course: "Juice & Food Manufacturing",
+    instructor: "Food Safety Specialist / Manufacturing Expert",
+    date: "2024-09-22",
+    time: "2:00 PM - 4:00 PM",
+    duration: 2,
+    location: "BEAM Food Lab",
+    maxStudents: 15,
+    enrolledStudents: 0,
+    category: "Manufacturing",
+    price: "Free (unlocked through community donations)",
+    featured: false,
+    courseId: 15
   }
 ]
 
-const categories = ['All', 'Technology', 'Transportation', 'Community Skills', 'Health & Wellness', 'Arts & Music', 'Business & Finance', 'Real Estate', 'Digital Finance']
+const categories = ['All', 'Technology', 'Transportation', 'Transportation Innovation', 'Community Skills', 'Health & Wellness', 'Arts & Music', 'Business & Finance', 'Real Estate', 'Digital Finance', 'Manufacturing']
 
 export default function SchedulePage() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [selectedDate, setSelectedDate] = useState('')
   const [viewMode, setViewMode] = useState('list') // 'list' or 'calendar'
   const [isSkillsDropdownOpen, setIsSkillsDropdownOpen] = useState(false)
+  const [currentMonth, setCurrentMonth] = useState(new Date())
 
   const filteredSchedule = scheduleData.filter(item => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory
@@ -315,6 +361,15 @@ export default function SchedulePage() {
                         >
                           <Award className="h-5 w-5" />
                           <span className="font-satoshi font-medium">Certifications</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/dashboard" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <BarChart3 className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Dashboard</span>
                         </Link>
                       </div>
                       
@@ -490,7 +545,7 @@ export default function SchedulePage() {
                           </div>
                           
                           <div className="flex-shrink-0">
-                            <Link href={`/enroll/${item.courseId}`} className="flex items-center text-primary-600 font-semibold group-hover:text-primary-700 transition-colors">
+                            <Link href={`/login?next=/enroll/${item.courseId}`} className="flex items-center text-primary-600 font-semibold group-hover:text-primary-700 transition-colors">
                               Enroll Now
                               <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                             </Link>
@@ -504,13 +559,96 @@ export default function SchedulePage() {
             ) : (
               /* Calendar View */
               <div className="card">
-                <div className="text-center mb-8">
+                <div className="mb-8">
                   <h3 className="text-2xl font-semibold text-gray-900 mb-4">Calendar View</h3>
-                  <p className="text-lg text-gray-600">Interactive calendar view coming soon...</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <button
+                        onClick={() => {
+                          setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
+                        }}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </button>
+                      <h4 className="text-lg font-medium text-gray-700">
+                        {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                      </h4>
+                      <button
+                        onClick={() => {
+                          setCurrentMonth(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
+                        }}
+                        className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl p-12 text-center">
-                  <Calendar className="h-20 w-20 text-primary-600 mx-auto mb-6" />
-                  <p className="text-lg text-primary-700 font-medium">Interactive calendar view will be implemented here</p>
+                
+                {/* Calendar Grid */}
+                <div className="grid grid-cols-7 gap-1 mb-4">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    <div key={day} className="p-3 text-center text-sm font-semibold text-gray-600 bg-gray-50 rounded-lg">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="grid grid-cols-7 gap-1">
+                  {(() => {
+                    const firstOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1)
+                    const start = new Date(firstOfMonth)
+                    start.setDate(start.getDate() - start.getDay())
+                    const cells = [] as JSX.Element[]
+                    for (let i = 0; i < 42; i++) {
+                      const date = new Date(start)
+                      date.setDate(start.getDate() + i)
+                      const dateString = date.toISOString().split('T')[0]
+                      const daySchedule = scheduleData.filter(item => item.date === dateString)
+                      const isCurrentMonth = date.getMonth() === currentMonth.getMonth()
+                      cells.push(
+                        <div
+                          key={i}
+                          className={`relative min-h-[90px] p-2 border border-gray-200 rounded-lg ${
+                            isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'
+                          }`}
+                        >
+                          <div className="text-sm font-medium">{date.getDate()}</div>
+                          {daySchedule.length > 0 && (
+                            <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary-500" />
+                          )}
+                          <div className="mt-1 space-y-1">
+                            {daySchedule.slice(0, 2).map((item, index) => (
+                              <div
+                                key={index}
+                                className="text-[10px] p-1 bg-primary-100 text-primary-700 rounded cursor-pointer hover:bg-primary-200 transition-colors"
+                                title={`${item.course} - ${item.time}`}
+                              >
+                                {item.course.split(' ').slice(0, 2).join(' ')}...
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )
+                    }
+                    return cells
+                  })()}
+                </div>
+                
+                {/* Legend */}
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h5 className="text-sm font-semibold text-gray-700 mb-3">Legend</h5>
+                  <div className="flex flex-wrap gap-4 text-xs">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-primary-100 rounded mr-2"></div>
+                      <span>Class Scheduled</span>
+                    </div>
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-gray-100 rounded mr-2"></div>
+                      <span>Other Month</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

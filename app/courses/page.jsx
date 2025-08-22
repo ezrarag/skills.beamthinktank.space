@@ -1,20 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, Clock, Users, Star, Filter, Search, Heart, ArrowRight, Lightbulb, ExternalLink, ChevronDown, ChevronUp, Brain, Calendar, Award, LogIn, UserPlus, Hammer } from 'lucide-react'
+import { BookOpen, Clock, Users, Star, Filter, Search, Heart, ArrowRight, Lightbulb, ExternalLink, ChevronDown, ChevronUp, Brain, Calendar, Award, LogIn, UserPlus, Hammer, BarChart3, CheckCircle } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import Toast from '../components/Toast'
 
 const categories = [
   'All',
   'Technology',
   'Transportation',
+  'Transportation Innovation',
   'Community Skills',
   'Health & Wellness',
   'Arts & Music',
   'Business & Finance',
   'Real Estate',
-  'Digital Finance'
+  'Digital Finance',
+  'Manufacturing'
 ]
 
 const courses = [
@@ -233,6 +237,63 @@ const courses = [
     startDate: "2024-09-18",
     endDate: "2024-11-20",
     classTime: "Wednesdays, 6:00 PM - 8:00 PM"
+  },
+  {
+    id: 13,
+    title: "Fabrication & Product Design",
+    description: "Learn how to design and fabricate everyday products using modern tools like 3D printers, CNC machines, and textiles. Students will explore wearable tech concepts such as hybrid shoes with GPS tracking, custom clothing, and community-use devices. This course emphasizes how to build not just products, but also the tools for production.",
+    category: "Manufacturing",
+    price: "Free (unlocked through community donations)",
+    duration: "14 weeks (2.5 hrs / session)",
+    students: 0,
+    rating: 4.7,
+    instructor: "Product Design Engineer / Fabrication Specialist",
+    level: "Intermediate",
+    featured: true,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg", // Placeholder for fabrication image
+    videoUrl: null,
+    location: "BEAM Innovation Lab",
+    startDate: "2024-09-20",
+    endDate: "2024-12-27",
+    classTime: "Fridays, 6:00 PM - 8:30 PM"
+  },
+  {
+    id: 14,
+    title: "Automotive Design & Fabrication",
+    description: "A hands-on workshop for designing and building new vehicles from the ground up. Unlike the car maintenance course, this class focuses on innovation: designing lightweight chassis, experimenting with hybrid or electric drivetrains, and fabricating components in-house.",
+    category: "Transportation Innovation",
+    price: "Free (unlocked through community donations)",
+    duration: "16 weeks (3 hrs / session)",
+    students: 0,
+    rating: 4.8,
+    instructor: "Automotive Engineer / Fabrication Expert",
+    level: "Advanced",
+    featured: true,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-daniel-andraski-197681005-13065692.jpg", // Placeholder for automotive design image
+    videoUrl: null,
+    location: "BEAM Automotive Workshop",
+    startDate: "2024-09-21",
+    endDate: "2025-01-11",
+    classTime: "Saturdays, 9:00 AM - 12:00 PM"
+  },
+  {
+    id: 15,
+    title: "Juice & Food Manufacturing",
+    description: "Learn how to design and operate small-scale juice and food manufacturing processes, from sourcing ingredients to packaging and community distribution.",
+    category: "Manufacturing",
+    price: "Free (unlocked through community donations)",
+    duration: "12 weeks (2 hrs / session)",
+    students: 0,
+    rating: 4.7,
+    instructor: "Food Safety Specialist / Manufacturing Expert",
+    level: "Beginner",
+    featured: false,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg", // Placeholder for food manufacturing image
+    videoUrl: null,
+    location: "BEAM Food Lab",
+    startDate: "2024-09-22",
+    endDate: "2024-12-15",
+    classTime: "Sundays, 2:00 PM - 4:00 PM"
   }
 ]
 
@@ -240,10 +301,38 @@ export default function CoursesPage() {
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('rating')
-  const [priceFilter, setPriceFilter] = useState(['Free (Community Funded)'])
-  const [levelFilter, setLevelFilter] = useState(['Beginner'])
+  const [priceFilter, setPriceFilter] = useState(['Free (Community Funded)', 'Sponsored Programs'])
+  const [levelFilter, setLevelFilter] = useState(['Beginner', 'Intermediate', 'Advanced'])
   const [expandedCard, setExpandedCard] = useState(null)
   const [isSkillsDropdownOpen, setIsSkillsDropdownOpen] = useState(false)
+  const [user, setUser] = useState(null)
+  const [enrolledCourses, setEnrolledCourses] = useState<number[]>([])
+  const [enrolling, setEnrolling] = useState<number | null>(null)
+  const [showToast, setShowToast] = useState(false)
+  const [toastMessage, setToastMessage] = useState('')
+  const [toastType, setToastType] = useState<'success' | 'error'>('success')
+
+  // Check user authentication and fetch enrolled courses
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUser(user)
+        // Fetch enrolled courses
+        const { data: enrollments } = await supabase
+          .from('enrollments')
+          .select('course_id')
+          .eq('user_id', user.id)
+          .in('status', ['confirmed', 'pending'])
+        
+        if (enrollments) {
+          setEnrolledCourses(enrollments.map(e => e.course_id))
+        }
+      }
+    }
+    
+    checkUser()
+  }, [])
 
   const filteredCourses = courses.filter(course => {
     const matchesCategory = selectedCategory === 'All' || course.category === selectedCategory
@@ -270,6 +359,54 @@ export default function CoursesPage() {
         return b.rating - a.rating
     }
   })
+
+  const handleEnroll = async (courseId: number) => {
+    if (!user) {
+      setToastMessage('Please sign in to enroll in courses')
+      setToastType('error')
+      setShowToast(true)
+      return
+    }
+
+    setEnrolling(courseId)
+    try {
+      // Check if already enrolled
+      if (enrolledCourses.includes(courseId)) {
+        setToastMessage('You are already enrolled in this course')
+        setToastType('error')
+        setShowToast(true)
+        return
+      }
+
+      // Create enrollment
+      const { error } = await supabase
+        .from('enrollments')
+        .insert({
+          user_id: user.id,
+          course_id: courseId,
+          status: 'pending',
+          attendance_mode: 'in-person'
+        })
+
+      if (error) throw error
+
+      // Update local state
+      setEnrolledCourses(prev => [...prev, courseId])
+      
+      // Show success message
+      setToastMessage('Successfully enrolled in course! Check your dashboard.')
+      setToastType('success')
+      setShowToast(true)
+
+    } catch (error) {
+      console.error('Enrollment error:', error)
+      setToastMessage('Failed to enroll. Please try again.')
+      setToastType('error')
+      setShowToast(true)
+    } finally {
+      setEnrolling(null)
+    }
+  }
 
   const handlePriceFilterChange = (price) => {
     setPriceFilter(prev => 
@@ -316,7 +453,7 @@ export default function CoursesPage() {
                 whileTap={{ scale: 0.95 }}
               >
                 <Hammer className="h-5 w-5" />
-                <span className="font-satoshi">Skills</span>
+                <span className="font-satoshi">Courses</span>
                 <motion.div
                   animate={{ rotate: isSkillsDropdownOpen ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
@@ -382,6 +519,15 @@ export default function CoursesPage() {
                         >
                           <Award className="h-5 w-5" />
                           <span className="font-satoshi font-medium">Certifications</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/dashboard" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <BarChart3 className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Dashboard</span>
                         </Link>
                       </div>
                       
@@ -513,7 +659,7 @@ export default function CoursesPage() {
 
           {/* Course Listings */}
           <div className="flex-1">
-            {/* Search and Sort */}
+            {/* Search, Sort, and Show All */}
             <div className="flex flex-col sm:flex-row gap-6 mb-8">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -535,6 +681,17 @@ export default function CoursesPage() {
                 <option value="duration">Duration</option>
                 <option value="level">Level</option>
               </select>
+              <button
+                className="btn-secondary w-full sm:w-auto"
+                onClick={() => {
+                  setSelectedCategory('All')
+                  setSearchQuery('')
+                  setPriceFilter(['Free (Community Funded)', 'Sponsored Programs'])
+                  setLevelFilter(['Beginner', 'Intermediate', 'Advanced'])
+                }}
+              >
+                Show All
+              </button>
             </div>
 
             {/* Results Count */}
@@ -626,35 +783,47 @@ export default function CoursesPage() {
                         </div>
                         
                         <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-[#7A3B3B] transition-colors">{course.title}</h3>
-                        <p className="text-gray-600 mb-2 leading-relaxed text-lg">{course.description}</p>
-                        <p className="text-[#7A3B3B] text-sm font-medium mb-6">Show More</p>
+                        <p className="text-gray-600 mb-2 leading-relaxed text-lg line-clamp-2">{course.description}</p>
+                        {/* Hidden content that shows on expansion */}
+                        <AnimatePresence>
+                          {expandedCard === course.id && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.3, ease: "easeInOut" }}
+                              className="overflow-hidden"
+                            >
+                              <div className="space-y-3 mb-6">
+                                <div className="flex items-center text-gray-600">
+                                  <Star className="h-5 w-5 text-yellow-400 mr-3" />
+                                  <span className="font-medium">{course.rating}</span>
+                                  <span className="ml-2">(community pilot)</span>
+                                </div>
+                                
+                                <div className="flex items-center text-gray-600">
+                                  <Clock className="h-5 w-5 text-primary-600 mr-3" />
+                                  <span>{course.duration}</span>
+                                </div>
+                                
+                                <div className="flex items-center text-gray-600">
+                                  <Users className="h-5 w-5 text-primary-600 mr-3" />
+                                  <span>{course.instructor}</span>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                         
-                        <div className="space-y-3 mb-6">
-                          <div className="flex items-center text-gray-600">
-                            <Star className="h-5 w-5 text-yellow-400 mr-3" />
-                            <span className="font-medium">{course.rating}</span>
-                            <span className="ml-2">(community pilot)</span>
-                          </div>
-                          
-                          <div className="flex items-center text-gray-600">
-                            <Clock className="h-5 w-5 text-primary-600 mr-3" />
-                            <span>{course.duration}</span>
-                          </div>
-                          
-                          <div className="flex items-center text-gray-600">
-                            <Users className="h-5 w-5 text-primary-600 mr-3" />
-                            <span>{course.instructor}</span>
-                          </div>
-                        </div>
                       </div>
                       
-                      {/* Price and Expand Button */}
-                      <div className="flex items-center justify-between">
-                        <div className="text-2xl font-bold text-green-600">{course.price}</div>
+                      {/* Expand Button */}
+                      <div className="flex items-center justify-end">
                         <motion.button
                           className="flex items-center text-[#7A3B3B] font-semibold group-hover:text-[#6A2B2B] transition-colors"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
+                          onClick={(e) => { e.stopPropagation(); toggleCardExpansion(course.id) }}
                         >
                           {expandedCard === course.id ? (
                             <>
@@ -663,7 +832,7 @@ export default function CoursesPage() {
                             </>
                           ) : (
                             <>
-                              <span>Show More</span>
+                              <span>Show More Details</span>
                               <ChevronDown className="h-5 w-5 ml-2" />
                             </>
                           )}
@@ -706,19 +875,36 @@ export default function CoursesPage() {
                             
                             {/* Action Buttons */}
                             <div className="flex flex-col sm:flex-row gap-4">
-                              <Link 
-                                href={`/enroll/${course.id}`}
-                                className="btn-primary flex-1 text-center"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                Enroll Now
-                              </Link>
+                              {enrolledCourses.includes(course.id) ? (
+                                <div className="flex items-center justify-center gap-2 text-green-600 bg-green-50 px-4 py-3 rounded-lg border border-green-200 flex-1">
+                                  <CheckCircle className="h-5 w-5" />
+                                  <span className="font-medium">Enrolled</span>
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEnroll(course.id)
+                                  }}
+                                  disabled={enrolling === course.id}
+                                  className="btn-primary flex-1 text-center disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  {enrolling === course.id ? (
+                                    <>
+                                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mx-auto"></div>
+                                      Enrolling...
+                                    </>
+                                  ) : (
+                                    'Enroll Now'
+                                  )}
+                                </button>
+                              )}
                               <Link 
                                 href={`/courses/${course.id}`}
                                 className="btn-secondary flex-1 text-center"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                View Full Details
+                                Details
                               </Link>
                             </div>
                           </div>
@@ -751,6 +937,15 @@ export default function CoursesPage() {
           </div>
         </div>
       </div>
+      
+      {/* Toast Notification */}
+      <Toast
+        message={toastMessage}
+        type={toastType}
+        isVisible={showToast}
+        onClose={() => setShowToast(false)}
+        duration={4000}
+      />
     </div>
   )
 }

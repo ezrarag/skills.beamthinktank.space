@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, ChevronDown, ChevronUp, BookOpen, Users, Calendar, Award, LogIn, UserPlus, X, Hammer } from 'lucide-react'
+import { Brain, ChevronDown, ChevronUp, BookOpen, Users, Calendar, Award, LogIn, UserPlus, X, Hammer, BarChart3 } from 'lucide-react'
 
 export default function HomePage() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -36,7 +36,7 @@ export default function HomePage() {
                 whileTap={{ scale: 0.95 }}
               >
                 <Hammer className="h-5 w-5" />
-                <span className="font-satoshi">Skill</span>
+                <span className="font-satoshi">Home</span>
                 <motion.div
                   animate={{ rotate: isDropdownOpen ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
@@ -103,6 +103,23 @@ export default function HomePage() {
                           <Award className="h-5 w-5" />
                           <span className="font-satoshi font-medium">Certifications</span>
                         </Link>
+                        
+                        <Link 
+                          href="/dashboard" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeDropdown}
+                        >
+                          <BarChart3 className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Dashboard</span>
+                        </Link>
+                        <Link 
+                          href="/qr" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeDropdown}
+                        >
+                          <Calendar className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Scan QR</span>
+                        </Link>
                       </div>
                       
                       {/* Divider */}
@@ -168,20 +185,20 @@ export default function HomePage() {
             <div className="relative">
               <div className="relative rounded-3xl h-96 overflow-hidden">
                 <img 
-                  src="https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/home/pexels-kampus-7983573.jpg"
+                  src="https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg"
                   alt="Students learning together in a supportive environment"
                   className="w-full h-full object-cover"
                 />
                 
                 {/* Overlay Labels */}
                 <div className="absolute top-8 left-8 bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg">
-                  <span className="text-[#7A3B3B] font-medium font-satoshi">Convenient</span>
+                  <span className="text-[#7A3B3B] font-medium font-satoshi">Community</span>
                 </div>
                 <div className="absolute top-20 right-8 bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg">
-                  <span className="text-[#7A3B3B] font-medium font-satoshi">Caring</span>
+                  <span className="text-[#7A3B3B] font-medium font-satoshi">Learn</span>
                 </div>
                 <div className="absolute bottom-20 left-12 bg-white/90 backdrop-blur-sm rounded-2xl px-4 py-2 shadow-lg">
-                  <span className="text-[#7A3B3B] font-medium font-satoshi">Confidential</span>
+                  <span className="text-[#7A3B3B] font-medium font-satoshi">Earn</span>
                 </div>
               </div>
             </div>

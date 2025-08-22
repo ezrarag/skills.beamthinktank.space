@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Users, ChevronDown, ChevronUp, BookOpen, Calendar, Award, LogIn, UserPlus, Hammer, Filter, Star, ArrowRight, Search } from 'lucide-react'
+import { Users, ChevronDown, ChevronUp, BookOpen, Calendar, Award, LogIn, UserPlus, Hammer, Filter, Star, ArrowRight, Search, BarChart3 } from 'lucide-react'
 
 const instructors = [
   {
@@ -38,10 +38,159 @@ const instructors = [
     students: 0,
     yearsExperience: 6,
     featured: true
+  },
+  {
+    id: 4,
+    name: "Local Practitioner / Beginner-friendly Mentor",
+    specialty: "Community Skills & Gardening",
+    bio: "Experienced community gardeners and plant enthusiasts who believe in the power of green spaces to bring communities together. We teach sustainable practices and community collaboration.",
+    rating: 4.6,
+    courses: 1,
+    students: 0,
+    yearsExperience: 4,
+    featured: false
+  },
+  {
+    id: 5,
+    name: "Certified Healthcare Professional",
+    specialty: "Health & Wellness",
+    bio: "Licensed healthcare professionals dedicated to teaching essential life-saving skills and preventive care. We believe everyone should have access to basic health knowledge and emergency response training.",
+    rating: 4.8,
+    courses: 1,
+    students: 0,
+    yearsExperience: 10,
+    featured: false
+  },
+  {
+    id: 6,
+    name: "Audio Engineer / Advanced Musician",
+    specialty: "Audio Production & Music",
+    bio: "Professional audio engineers and musicians with extensive experience in recording, mixing, and mastering. We're passionate about helping others create professional-quality audio content.",
+    rating: 4.5,
+    courses: 1,
+    students: 0,
+    yearsExperience: 7,
+    featured: false
+  },
+  {
+    id: 7,
+    name: "Experienced Musician / Mentor",
+    specialty: "Multi-Genre Music",
+    bio: "Versatile musicians with expertise across jazz, classical, and contemporary genres. We believe in nurturing musical talent and building confidence through ensemble performance.",
+    rating: 4.7,
+    courses: 1,
+    students: 0,
+    yearsExperience: 9,
+    featured: false
+  },
+  {
+    id: 8,
+    name: "Vocal Coach / Mentor",
+    specialty: "Voice Training & Performance",
+    bio: "Professional vocal coaches with experience across multiple musical styles. We help students develop their unique voice and build confidence for public performance.",
+    rating: 4.6,
+    courses: 1,
+    students: 0,
+    yearsExperience: 6,
+    featured: false
+  },
+  {
+    id: 9,
+    name: "Local Designer / Advanced Participant",
+    specialty: "Community Design & Beautification",
+    bio: "Creative professionals and community leaders passionate about transforming public spaces. We believe in the power of design to strengthen community bonds and create lasting positive change.",
+    rating: 4.5,
+    courses: 1,
+    students: 0,
+    yearsExperience: 5,
+    featured: false
+  },
+  {
+    id: 10,
+    name: "Experienced Entrepreneur / Business Mentor",
+    specialty: "Business & Entrepreneurship",
+    bio: "Successful entrepreneurs and business professionals who love helping others turn their ideas into viable businesses. We focus on practical strategies and community-based business models.",
+    rating: 4.7,
+    courses: 1,
+    students: 0,
+    yearsExperience: 12,
+    featured: false
+  },
+  {
+    id: 11,
+    name: "Real Estate Developer / Finance Mentor",
+    specialty: "Real Estate & Development",
+    bio: "Experienced real estate professionals with expertise in commercial development and investment strategies. We teach practical skills for analyzing and developing real estate projects.",
+    rating: 4.8,
+    courses: 1,
+    students: 0,
+    yearsExperience: 15,
+    featured: false
+  },
+  {
+    id: 12,
+    name: "Crypto Professional / Fintech Mentor",
+    specialty: "Digital Finance & Cryptocurrency",
+    bio: "Blockchain and fintech professionals passionate about making digital finance accessible to everyone. We focus on practical applications and responsible crypto practices.",
+    rating: 4.6,
+    courses: 1,
+    students: 0,
+    yearsExperience: 6,
+    featured: false
+  },
+  {
+    id: 13,
+    name: "Product Design Engineer / Fabrication Specialist",
+    specialty: "Manufacturing & Product Design",
+    bio: "Innovative product designers and fabrication experts who believe in the power of local manufacturing. We teach how to build both products and the tools to make them.",
+    rating: 4.7,
+    courses: 1,
+    students: 0,
+    yearsExperience: 8,
+    featured: true
+  },
+  {
+    id: 14,
+    name: "Automotive Engineer / Fabrication Expert",
+    specialty: "Transportation Innovation & Design",
+    bio: "Automotive engineers and fabrication specialists focused on innovative vehicle design and sustainable transportation solutions. We believe in the future of community-scale vehicle development.",
+    rating: 4.8,
+    courses: 1,
+    students: 0,
+    yearsExperience: 11,
+    featured: true
+  },
+  {
+    id: 15,
+    name: "Food Safety Specialist / Manufacturing Expert",
+    specialty: "Manufacturing & Food Safety",
+    bio: "Certified food safety professionals with expertise in small-scale food manufacturing, quality control, and community food production. We ensure safe, sustainable food manufacturing practices.",
+    rating: 4.7,
+    courses: 1,
+    students: 0,
+    yearsExperience: 8,
+    featured: false
   }
 ]
 
-const specialties = ['All', 'Technology', 'Transportation', 'Community Skills']
+const specialties = [
+  'All', 
+  'Technology', 
+  'Transportation', 
+  'Transportation Innovation & Design',
+  'Community Skills & Gardening', 
+  'Health & Wellness',
+  'Music & Arts',
+  'Audio Production & Music',
+  'Multi-Genre Music',
+  'Voice Training & Performance',
+  'Community Design & Beautification',
+  'Business & Entrepreneurship',
+  'Real Estate & Development',
+  'Digital Finance & Cryptocurrency',
+  'Manufacturing & Product Design',
+  'Manufacturing & Food Safety'
+]
 
 export default function InstructorsPage() {
   const [selectedSpecialty, setSelectedSpecialty] = useState('All')
@@ -160,6 +309,15 @@ export default function InstructorsPage() {
                         >
                           <Award className="h-5 w-5" />
                           <span className="font-satoshi font-medium">Certifications</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/dashboard" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <BarChart3 className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Dashboard</span>
                         </Link>
                       </div>
                       

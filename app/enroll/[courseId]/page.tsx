@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { BookOpen, Clock, Users, MapPin, Calendar, CheckCircle, Phone, Mail, User } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import Toast from '../../components/Toast'
 
 const courses = [
   {
@@ -43,6 +45,45 @@ const courses = [
     classTime: "Sundays, 1:00 PM - 2:30 PM",
     maxStudents: 20,
     enrolledStudents: 3
+  },
+  {
+    id: 13,
+    title: "Fabrication & Product Design",
+    category: "Manufacturing",
+    duration: "14 weeks (2.5 hrs / session)",
+    instructor: "Product Design Engineer / Fabrication Specialist",
+    location: "BEAM Innovation Lab",
+    startDate: "September 20, 2024",
+    endDate: "December 27, 2024",
+    classTime: "Fridays, 6:00 PM - 8:30 PM",
+    maxStudents: 12,
+    enrolledStudents: 0
+  },
+  {
+    id: 14,
+    title: "Automotive Design & Fabrication",
+    category: "Transportation Innovation",
+    duration: "16 weeks (3 hrs / session)",
+    instructor: "Automotive Engineer / Fabrication Expert",
+    location: "BEAM Automotive Workshop",
+    startDate: "September 21, 2024",
+    endDate: "January 11, 2025",
+    classTime: "Saturdays, 9:00 AM - 12:00 PM",
+    maxStudents: 10,
+    enrolledStudents: 0
+  },
+  {
+    id: 15,
+    title: "Juice & Food Manufacturing",
+    category: "Manufacturing",
+    duration: "12 weeks (2 hrs / session)",
+    instructor: "Food Safety Specialist / Manufacturing Expert",
+    location: "BEAM Food Lab",
+    startDate: "September 22, 2024",
+    endDate: "December 15, 2024",
+    classTime: "Sundays, 2:00 PM - 4:00 PM",
+    maxStudents: 15,
+    enrolledStudents: 0
   }
 ]
 
@@ -60,6 +101,9 @@ export default function EnrollmentPage({ params }: { params: { courseId: string 
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [showToast, setShowToast] = useState(false)
+  const [toastMessage, setToastMessage] = useState('')
+  const [toastType, setToastType] = useState<'success' | 'error'>('success')
 
   if (!course) {
     return (
@@ -133,11 +177,21 @@ export default function EnrollmentPage({ params }: { params: { courseId: string 
             <Link href="/schedule" className="btn-primary w-full">
               View Class Schedule
             </Link>
-          </div>
-        </div>
+                  </div>
       </div>
-    )
-  }
+
+      {/* Toast Notification */}
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          duration={4000}
+          onClose={() => setShowToast(false)}
+        />
+      )}
+    </div>
+  )
+}
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -206,9 +260,27 @@ export default function EnrollmentPage({ params }: { params: { courseId: string 
                 </div>
                 <button
                   type="button"
-                  onClick={() => {
-                    // TODO: Integrate with Supabase Google Auth
-                    console.log('Google login clicked - integrate with Supabase')
+                  onClick={async () => {
+                    try {
+                      // Store the course ID in localStorage before redirecting
+                      localStorage.setItem('pendingCourseEnrollment', params.courseId)
+                      
+                      const { error } = await supabase.auth.signInWithOAuth({
+                        provider: 'google',
+                        options: {
+                          redirectTo: `${window.location.origin}/dashboard`
+                        }
+                      })
+                      if (error) {
+                        setToastMessage('Sign-in failed. Please try again.')
+                        setToastType('error')
+                        setShowToast(true)
+                      }
+                    } catch (error) {
+                      setToastMessage('Sign-in failed. Please try again.')
+                      setToastType('error')
+                      setShowToast(true)
+                    }
                   }}
                   className="w-full flex items-center justify-center px-4 py-3 border border-gray-300 rounded-xl shadow-sm bg-white text-gray-700 hover:bg-gray-50 transition-colors duration-200"
                 >
@@ -399,6 +471,16 @@ export default function EnrollmentPage({ params }: { params: { courseId: string 
           </div>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          duration={4000}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   )
 }

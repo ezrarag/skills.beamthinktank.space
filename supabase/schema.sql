@@ -83,7 +83,35 @@ CREATE TABLE IF NOT EXISTS public.notifications (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Insert your two BEAM Skills courses
+-- Add attendance_mode column to enrollments table
+ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS attendance_mode TEXT DEFAULT 'in-person' CHECK (attendance_mode IN ('in-person', 'jitsi', 'discord'));
+
+-- Class sessions table for tracking individual class instances
+CREATE TABLE IF NOT EXISTS public.class_sessions (
+  id SERIAL PRIMARY KEY,
+  course_id INTEGER REFERENCES public.courses(id) ON DELETE CASCADE,
+  session_date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  jitsi_room_id TEXT UNIQUE,
+  discord_channel_id TEXT,
+  discord_invite_link TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Attendance tracking per session
+CREATE TABLE IF NOT EXISTS public.session_attendance (
+  id SERIAL PRIMARY KEY,
+  session_id INTEGER REFERENCES public.class_sessions(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+  attendance_mode TEXT CHECK (attendance_mode IN ('in-person', 'jitsi', 'discord')),
+  joined_at TIMESTAMP WITH TIME ZONE,
+  left_at TIMESTAMP WITH TIME ZONE,
+  notes TEXT,
+  UNIQUE(session_id, user_id)
+);
+
+-- Insert your BEAM Skills courses
 INSERT INTO public.courses (
   title, description, long_description, category, price, duration, total_hours,
   instructor, level, featured, location, start_date, end_date, class_time, max_students
@@ -121,6 +149,74 @@ INSERT INTO public.courses (
   '2024-04-05',
   'Fridays, 2:00 PM - 4:00 PM',
   12
+),
+(
+  'Orchestra Repertoire for Beginners',
+  'Learn to play orchestral instruments and perform in a community ensemble. No prior musical experience required.',
+  'Join our community orchestra and discover the joy of making music together. This course is designed for complete beginners who want to learn an orchestral instrument. We provide instruments and teach you everything from basic music theory to ensemble playing. By the end of the course, you''ll perform in a community concert.',
+  'Arts & Music',
+  'Free (unlocked through community donations)',
+  '16 weeks (1.5 hrs / session)',
+  24,
+  'BEAM Skills Music Volunteers',
+  'Beginner',
+  false,
+  'Library - Music Room',
+  '2024-02-17',
+  '2024-06-08',
+  'Saturdays, 1:00 PM - 2:30 PM',
+  20
+),
+(
+  'Fabrication & Product Design',
+  'Learn how to design and fabricate everyday products using modern tools like 3D printers, CNC machines, and textiles.',
+  'Students will explore wearable tech concepts such as hybrid shoes with GPS tracking, custom clothing, and community-use devices. This course emphasizes how to build not just products, but also the tools for production.',
+  'Manufacturing',
+  'Free (unlocked through community donations)',
+  '14 weeks (2.5 hrs / session)',
+  35,
+  'Product Design Engineer / Fabrication Specialist',
+  'Intermediate',
+  true,
+  'BEAM Innovation Lab',
+  '2024-09-20',
+  '2024-12-27',
+  'Fridays, 6:00 PM - 8:30 PM',
+  12
+),
+(
+  'Automotive Design & Fabrication',
+  'A hands-on workshop for designing and building new vehicles from the ground up.',
+  'Unlike the car maintenance course, this class focuses on innovation: designing lightweight chassis, experimenting with hybrid or electric drivetrains, and fabricating components in-house.',
+  'Transportation Innovation',
+  'Free (unlocked through community donations)',
+  '16 weeks (3 hrs / session)',
+  48,
+  'Automotive Engineer / Fabrication Expert',
+  'Advanced',
+  true,
+  'BEAM Automotive Workshop',
+  '2024-09-21',
+  '2025-01-11',
+  'Saturdays, 9:00 AM - 12:00 PM',
+  10
+),
+(
+  'Juice & Food Manufacturing',
+  'Learn how to design and operate small-scale juice and food manufacturing processes.',
+  'From sourcing ingredients to packaging and community distribution. Students will gain hands-on experience with food handling equipment, learn about certifications in food safety, and understand the business aspects of community food production.',
+  'Manufacturing',
+  'Free (unlocked through community donations)',
+  '12 weeks (2 hrs / session)',
+  24,
+  'Food Safety Specialist / Manufacturing Expert',
+  'Beginner',
+  false,
+  'BEAM Food Lab',
+  '2024-09-22',
+  '2024-12-15',
+  'Sundays, 2:00 PM - 4:00 PM',
+  15
 );
 
 -- Insert course schedules
@@ -212,6 +308,17 @@ CREATE POLICY "Users can insert own enrollments" ON public.enrollments
 -- Notifications: Users can only see their own notifications
 CREATE POLICY "Users can view own notifications" ON public.notifications
   FOR SELECT USING (auth.uid() = user_id);
+
+-- Class sessions: Everyone can view
+CREATE POLICY "Anyone can view class sessions" ON public.class_sessions
+  FOR SELECT USING (true);
+
+-- Session attendance: Users can only see their own attendance
+CREATE POLICY "Users can view own session attendance" ON public.session_attendance
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own session attendance" ON public.session_attendance
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
 
 -- Function to update course enrollment count
 CREATE OR REPLACE FUNCTION update_course_enrollment()
