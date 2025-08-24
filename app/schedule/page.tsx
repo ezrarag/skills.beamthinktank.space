@@ -351,6 +351,36 @@ const scheduleData = [
     price: "Free (unlocked through community donations)",
     featured: false,
     courseId: 25
+  },
+  {
+    id: 26,
+    course: "International Construction & Sustainable Development",
+    instructor: "Construction Professional / International Development Specialist",
+    date: "2024-10-01",
+    time: "6:00 PM - 8:00 PM",
+    duration: 2,
+    location: "BEAM Innovation Lab",
+    maxStudents: 15,
+    enrolledStudents: 0,
+    category: "Design & Built Environment",
+    price: "Free (unlocked through community donations)",
+    featured: true,
+    courseId: 26
+  },
+  {
+    id: 27,
+    course: "Beautification & Entrepreneurship",
+    instructor: "Beauty Industry Professional / Entrepreneurship Mentor",
+    date: "2024-10-03",
+    time: "6:00 PM - 8:00 PM",
+    duration: 2,
+    location: "BEAM Community Hub",
+    maxStudents: 15,
+    enrolledStudents: 0,
+    category: "Business & Finance",
+    price: "Free (unlocked through community donations)",
+    featured: true,
+    courseId: 27
   }
 ]
 
