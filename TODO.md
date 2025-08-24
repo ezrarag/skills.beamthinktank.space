@@ -2,6 +2,22 @@
 
 ## Course Management
 - [ ] Implement dynamic spots remaining display on enroll page
+- [ ] Create unified course management system for consistent enrollment/removal across pages
+- [ ] Implement real-time course data sync between static data and Supabase
+- [ ] Add course completion tracking and certification generation
+- [ ] Create course attendance tracking system with geolocation support
+
+## Data Synchronization
+- [ ] Build system to sync static course data with Supabase database
+- [ ] Implement admin dashboard for course data management
+- [ ] Create real-time updates between frontend and backend
+- [ ] Add course scheduling and session management
+
+## User Experience
+- [ ] Fix course removal persistence across dashboard and courses page
+- [ ] Implement proper state management for enrolled courses
+- [ ] Add loading states and error handling for course operations
+- [ ] Create seamless course enrollment flow
   - Only show when enrolled students reach certain threshold
   - Calculate available spots based on max_students vs enrolled_students
   - Hide spots remaining for courses with low enrollment - BEAM Skills Training Site

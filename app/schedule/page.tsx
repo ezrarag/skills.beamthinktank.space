@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar, Clock, Users, MapPin, Filter, ChevronLeft, ChevronRight, Heart, ArrowRight, ChevronDown, ChevronUp, Brain, BookOpen, Award, LogIn, UserPlus, Hammer, BarChart3 } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 const scheduleData = [
   {
@@ -187,7 +188,7 @@ const scheduleData = [
     courseId: 12
   },
   {
-    id: 13,
+    id: 17,
     course: "Fabrication & Product Design",
     instructor: "Product Design Engineer / Fabrication Specialist",
     date: "2024-09-20",
@@ -199,10 +200,10 @@ const scheduleData = [
     category: "Manufacturing",
     price: "Free (unlocked through community donations)",
     featured: true,
-    courseId: 13
+          courseId: 17
   },
   {
-    id: 14,
+    id: 5,
     course: "Automotive Design & Fabrication",
     instructor: "Automotive Engineer / Fabrication Expert",
     date: "2024-09-21",
@@ -214,10 +215,10 @@ const scheduleData = [
     category: "Transportation Innovation",
     price: "Free (unlocked through community donations)",
     featured: true,
-    courseId: 14
+          courseId: 5
   },
   {
-    id: 15,
+    id: 16,
     course: "Juice & Food Manufacturing",
     instructor: "Food Safety Specialist / Manufacturing Expert",
     date: "2024-09-22",
@@ -229,11 +230,116 @@ const scheduleData = [
     category: "Manufacturing",
     price: "Free (unlocked through community donations)",
     featured: false,
-    courseId: 15
+          courseId: 16
+  },
+  {
+    id: 18,
+    course: "Beginning French & Creole",
+    instructor: "Language & Culture Specialist",
+    date: "2024-09-23",
+    time: "6:00 PM - 7:30 PM",
+    duration: 1.5,
+    location: "BEAM Language Lab",
+    maxStudents: 20,
+    enrolledStudents: 0,
+    category: "Languages",
+    price: "Free (unlocked through community donations)",
+    featured: false,
+    courseId: 18
+  },
+  {
+    id: 19,
+    course: "Beginning Architecture",
+    instructor: "Architectural Designer / Urban Planner",
+    date: "2024-09-24",
+    time: "6:00 PM - 8:00 PM",
+    duration: 2,
+    location: "BEAM Design Studio",
+    maxStudents: 15,
+    enrolledStudents: 0,
+    category: "Design & Built Environment",
+    price: "Free (unlocked through community donations)",
+    featured: true,
+    courseId: 19
+  },
+  {
+    id: 20,
+    course: "Beginning Drawing",
+    instructor: "Visual Artist / Art Educator",
+    date: "2024-09-25",
+    time: "6:00 PM - 7:30 PM",
+    duration: 1.5,
+    location: "BEAM Art Studio",
+    maxStudents: 18,
+    enrolledStudents: 0,
+    category: "Visual Arts",
+    price: "Free (unlocked through community donations)",
+    featured: false,
+    courseId: 20
+  },
+  {
+    id: 21,
+    course: "Beginning Interior Design",
+    instructor: "Interior Designer / Sustainability Specialist",
+    date: "2024-09-26",
+    time: "6:00 PM - 8:00 PM",
+    duration: 2,
+    location: "BEAM Design Studio",
+    maxStudents: 16,
+    enrolledStudents: 0,
+    category: "Design & Built Environment",
+    price: "Free (unlocked through community donations)",
+    featured: false,
+    courseId: 21
+  },
+  {
+    id: 22,
+    course: "Real Estate Attorney Law",
+    instructor: "Real Estate Attorney / Legal Educator",
+    date: "2024-09-27",
+    time: "6:00 PM - 8:30 PM",
+    duration: 2.5,
+    location: "BEAM Legal Center",
+    maxStudents: 12,
+    enrolledStudents: 0,
+    category: "Legal & Governance",
+    price: "Free (unlocked through community donations)",
+    featured: true,
+    courseId: 22
+  },
+  {
+    id: 23,
+    course: "Governance",
+    instructor: "Governance Specialist / Civic Educator",
+    date: "2024-09-28",
+    time: "10:00 AM - 12:00 PM",
+    duration: 2,
+    location: "BEAM Civic Center",
+    maxStudents: 20,
+    enrolledStudents: 0,
+    category: "Leadership & Civic Studies",
+    price: "Free (unlocked through community donations)",
+    featured: true,
+    courseId: 23
+  },
+  {
+    id: 24,
+    course: "Accounting",
+    instructor: "Certified Accountant / Financial Educator",
+    date: "2024-09-29",
+    time: "2:00 PM - 4:00 PM",
+    duration: 2,
+    location: "BEAM Financial Center",
+    maxStudents: 18,
+    enrolledStudents: 0,
+    category: "Finance & Productivity",
+    price: "Free (unlocked through community donations)",
+    featured: false,
+    courseId: 24
   }
 ]
 
-const categories = ['All', 'Technology', 'Transportation', 'Transportation Innovation', 'Community Skills', 'Health & Wellness', 'Arts & Music', 'Business & Finance', 'Real Estate', 'Digital Finance', 'Manufacturing']
+const categories = ['All', 'Technology', 'Transportation', 'Transportation Innovation', 'Community Skills', 'Health & Wellness', 'Arts & Music', 'Business & Finance', 'Real Estate', 'Digital Finance', 'Manufacturing', 'Languages', 'Design & Built Environment', 'Visual Arts', 'Legal & Governance', 'Leadership & Civic Studies', 'Finance & Productivity']
 
 export default function SchedulePage() {
   const [selectedCategory, setSelectedCategory] = useState('All')
@@ -241,6 +347,19 @@ export default function SchedulePage() {
   const [viewMode, setViewMode] = useState('list') // 'list' or 'calendar'
   const [isSkillsDropdownOpen, setIsSkillsDropdownOpen] = useState(false)
   const [currentMonth, setCurrentMonth] = useState(new Date())
+  const [user, setUser] = useState<any>(null)
+
+  // Check user authentication
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUser(user)
+      }
+    }
+    
+    checkUser()
+  }, [])
 
   const filteredSchedule = scheduleData.filter(item => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory
@@ -378,23 +497,38 @@ export default function SchedulePage() {
                       
                       {/* Auth Links */}
                       <div className="px-4 py-2">
-                        <Link 
-                          href="/login" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
-                          onClick={closeSkillsDropdown}
-                        >
-                          <LogIn className="h-5 w-5" />
-                          <span className="font-satoshi font-medium">Sign In</span>
-                        </Link>
-                        
-                        <Link 
-                          href="/register" 
-                          className="flex items-center space-x-3 px-3 py-3 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all duration-200"
-                          onClick={closeSkillsDropdown}
-                        >
-                          <UserPlus className="h-5 w-5" />
-                          <span className="font-satoshi font-medium">Get Started</span>
-                        </Link>
+                        {user ? (
+                          <button
+                            onClick={async () => {
+                              await supabase.auth.signOut()
+                              window.location.href = '/'
+                            }}
+                            className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200 w-full text-left"
+                          >
+                            <LogIn className="h-5 w-5" />
+                            <span className="font-satoshi font-medium">Sign Out</span>
+                          </button>
+                        ) : (
+                          <>
+                            <Link 
+                              href="/login" 
+                              className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                              onClick={closeSkillsDropdown}
+                            >
+                              <LogIn className="h-5 w-5" />
+                              <span className="font-satoshi font-medium">Sign In</span>
+                            </Link>
+                            
+                            <Link 
+                              href="/register" 
+                              className="flex items-center space-x-3 px-3 py-3 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all duration-200"
+                              onClick={closeSkillsDropdown}
+                            >
+                              <UserPlus className="h-5 w-5" />
+                              <span className="font-satoshi font-medium">Get Started</span>
+                            </Link>
+                          </>
+                        )}
                       </div>
                     </motion.div>
                   </>
@@ -619,15 +753,11 @@ export default function SchedulePage() {
                             <div className="absolute top-1 right-1 w-2 h-2 rounded-full bg-primary-500" />
                           )}
                           <div className="mt-1 space-y-1">
-                            {daySchedule.slice(0, 2).map((item, index) => (
-                              <div
-                                key={index}
-                                className="text-[10px] p-1 bg-primary-100 text-primary-700 rounded cursor-pointer hover:bg-primary-200 transition-colors"
-                                title={`${item.course} - ${item.time}`}
-                              >
-                                {item.course.split(' ').slice(0, 2).join(' ')}...
+                            {daySchedule.length > 0 && (
+                              <div className="text-[10px] p-1 bg-primary-100 text-primary-700 rounded">
+                                {daySchedule.length} class{daySchedule.length > 1 ? 'es' : ''}
                               </div>
-                            ))}
+                            )}
                           </div>
                         </div>
                       )

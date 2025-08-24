@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Users, ChevronDown, ChevronUp, BookOpen, Calendar, Award, LogIn, UserPlus, Hammer, Filter, Star, ArrowRight, Search, BarChart3 } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
 
 const instructors = [
   {
@@ -139,7 +140,7 @@ const instructors = [
     featured: false
   },
   {
-    id: 13,
+    id: 17,
     name: "Product Design Engineer / Fabrication Specialist",
     specialty: "Manufacturing & Product Design",
     bio: "Innovative product designers and fabrication experts who believe in the power of local manufacturing. We teach how to build both products and the tools to make them.",
@@ -150,7 +151,7 @@ const instructors = [
     featured: true
   },
   {
-    id: 14,
+    id: 5,
     name: "Automotive Engineer / Fabrication Expert",
     specialty: "Transportation Innovation & Design",
     bio: "Automotive engineers and fabrication specialists focused on innovative vehicle design and sustainable transportation solutions. We believe in the future of community-scale vehicle development.",
@@ -161,7 +162,7 @@ const instructors = [
     featured: true
   },
   {
-    id: 15,
+    id: 16,
     name: "Food Safety Specialist / Manufacturing Expert",
     specialty: "Manufacturing & Food Safety",
     bio: "Certified food safety professionals with expertise in small-scale food manufacturing, quality control, and community food production. We ensure safe, sustainable food manufacturing practices.",
@@ -169,6 +170,83 @@ const instructors = [
     courses: 1,
     students: 0,
     yearsExperience: 8,
+    featured: false
+  },
+  {
+    id: 18,
+    name: "Language & Culture Specialist",
+    specialty: "Languages & Cultural Studies",
+    bio: "Experienced language educators with expertise in French and Haitian Creole, focusing on cultural context and practical communication skills for community development.",
+    rating: 4.6,
+    courses: 1,
+    students: 0,
+    yearsExperience: 6,
+    featured: false
+  },
+  {
+    id: 19,
+    name: "Architectural Designer / Urban Planner",
+    specialty: "Architecture & Urban Design",
+    bio: "Professional architects and urban planners passionate about community-centered design and sustainable built environments that serve local needs.",
+    rating: 4.7,
+    courses: 1,
+    students: 0,
+    yearsExperience: 9,
+    featured: true
+  },
+  {
+    id: 20,
+    name: "Visual Artist / Art Educator",
+    specialty: "Visual Arts & Drawing",
+    bio: "Skilled visual artists and educators who believe in the power of drawing as a fundamental skill for communication, design, and creative expression.",
+    rating: 4.5,
+    courses: 1,
+    students: 0,
+    yearsExperience: 7,
+    featured: false
+  },
+  {
+    id: 21,
+    name: "Interior Designer / Sustainability Specialist",
+    specialty: "Interior Design & Sustainability",
+    bio: "Creative interior designers with expertise in sustainable materials and space planning, focused on creating functional and beautiful community spaces.",
+    rating: 4.6,
+    courses: 1,
+    students: 0,
+    yearsExperience: 8,
+    featured: false
+  },
+  {
+    id: 22,
+    name: "Real Estate Attorney / Legal Educator",
+    specialty: "Real Estate Law & Compliance",
+    bio: "Experienced real estate attorneys dedicated to teaching practical legal knowledge for community real estate development and protection.",
+    rating: 4.8,
+    courses: 1,
+    students: 0,
+    yearsExperience: 12,
+    featured: true
+  },
+  {
+    id: 23,
+    name: "Governance Specialist / Civic Educator",
+    specialty: "Governance & Civic Leadership",
+    bio: "Experts in democratic governance and cooperative structures, committed to building transparent and effective community decision-making systems.",
+    rating: 4.7,
+    courses: 1,
+    students: 0,
+    yearsExperience: 10,
+    featured: true
+  },
+  {
+    id: 24,
+    name: "Certified Accountant / Financial Educator",
+    specialty: "Accounting & Financial Management",
+    bio: "Professional accountants with expertise in nonprofit and cooperative financial management, focused on building sustainable community financial systems.",
+    rating: 4.6,
+    courses: 1,
+    students: 0,
+    yearsExperience: 9,
     featured: false
   }
 ]
@@ -189,7 +267,14 @@ const specialties = [
   'Real Estate & Development',
   'Digital Finance & Cryptocurrency',
   'Manufacturing & Product Design',
-  'Manufacturing & Food Safety'
+  'Manufacturing & Food Safety',
+  'Languages & Cultural Studies',
+  'Architecture & Urban Design',
+  'Visual Arts & Drawing',
+  'Interior Design & Sustainability',
+  'Real Estate Law & Compliance',
+  'Governance & Civic Leadership',
+  'Accounting & Financial Management'
 ]
 
 export default function InstructorsPage() {
@@ -197,6 +282,19 @@ export default function InstructorsPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState('rating')
   const [isSkillsDropdownOpen, setIsSkillsDropdownOpen] = useState(false)
+  const [user, setUser] = useState<any>(null)
+
+  // Check user authentication
+  useEffect(() => {
+    const checkUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        setUser(user)
+      }
+    }
+    
+    checkUser()
+  }, [])
 
   const toggleSkillsDropdown = () => {
     setIsSkillsDropdownOpen(!isSkillsDropdownOpen)
@@ -326,23 +424,38 @@ export default function InstructorsPage() {
                       
                       {/* Auth Links */}
                       <div className="px-4 py-2">
-                        <Link 
-                          href="/login" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
-                          onClick={closeSkillsDropdown}
-                        >
-                          <LogIn className="h-5 w-5" />
-                          <span className="font-satoshi font-medium">Sign In</span>
-                        </Link>
-                        
-                        <Link 
-                          href="/register" 
-                          className="flex items-center space-x-3 px-3 py-3 text-[#7A3B3B] hover:text-[#6A2B2B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
-                          onClick={closeSkillsDropdown}
-                        >
-                          <UserPlus className="h-5 w-5" />
-                          <span className="font-satoshi font-medium">Get Started</span>
-                        </Link>
+                        {user ? (
+                          <button
+                            onClick={async () => {
+                              await supabase.auth.signOut()
+                              window.location.href = '/'
+                            }}
+                            className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200 w-full text-left"
+                          >
+                            <LogIn className="h-5 w-5" />
+                            <span className="font-satoshi font-medium">Sign Out</span>
+                          </button>
+                        ) : (
+                          <>
+                            <Link 
+                              href="/login" 
+                              className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                              onClick={closeSkillsDropdown}
+                            >
+                              <LogIn className="h-5 w-5" />
+                              <span className="font-satoshi font-medium">Sign In</span>
+                            </Link>
+                            
+                            <Link 
+                              href="/register" 
+                              className="flex items-center space-x-3 px-3 py-3 text-[#7A3B3B] hover:text-[#6A2B2B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                              onClick={closeSkillsDropdown}
+                            >
+                              <UserPlus className="h-5 w-5" />
+                              <span className="font-satoshi font-medium">Get Started</span>
+                            </Link>
+                          </>
+                        )}
                       </div>
                     </motion.div>
                   </>
@@ -472,6 +585,19 @@ export default function InstructorsPage() {
                             <div className="text-2xl font-bold text-primary-600">{instructor.yearsExperience}+</div>
                             <div className="text-sm text-gray-600">Years</div>
                           </div>
+                        </div>
+                        
+                        {/* Placeholder Overlay */}
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                          <div className="flex items-center">
+                            <div className="w-2 h-2 bg-yellow-500 rounded-full mr-3 animate-pulse"></div>
+                            <span className="text-sm text-yellow-700 font-medium">
+                              Information not available yet
+                            </span>
+                          </div>
+                          <p className="text-xs text-yellow-600 mt-1">
+                            Instructor profiles and detailed information will be available soon
+                          </p>
                         </div>
                         
                         <div className="flex items-center justify-between">

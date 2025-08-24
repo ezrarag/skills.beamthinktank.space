@@ -136,14 +136,7 @@ export default function HomePage() {
                           <span className="font-satoshi font-medium">Sign In</span>
                         </Link>
                         
-                        <Link 
-                          href="/register" 
-                          className="flex items-center space-x-3 px-3 py-3 text-[#7A3B3B] hover:text-[#6A2B2B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
-                          onClick={closeDropdown}
-                        >
-                          <UserPlus className="h-5 w-5" />
-                          <span className="font-satoshi font-medium">Get Started</span>
-                        </Link>
+
                       </div>
                     </motion.div>
                   </>

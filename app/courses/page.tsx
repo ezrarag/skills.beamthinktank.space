@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, Clock, Users, Star, Filter, Search, Heart, ArrowRight, Lightbulb, ExternalLink, ChevronDown, ChevronUp, Brain, Calendar, Award, LogIn, UserPlus, Hammer, BarChart3, CheckCircle } from 'lucide-react'
+import { BookOpen, Clock, Users, Star, Filter, Search, Heart, ArrowRight, Lightbulb, ExternalLink, ChevronDown, ChevronUp, Brain, Calendar, Award, LogIn, UserPlus, Hammer, BarChart3, CheckCircle, Plus, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import Toast from '../components/Toast'
 
@@ -18,7 +18,13 @@ const categories = [
   'Business & Finance',
   'Real Estate',
   'Digital Finance',
-  'Manufacturing'
+  'Manufacturing',
+  'Languages',
+  'Design & Built Environment',
+  'Visual Arts',
+  'Legal & Governance',
+  'Leadership & Civic Studies',
+  'Finance & Productivity'
 ]
 
 const courses = [
@@ -239,7 +245,7 @@ const courses = [
     classTime: "Wednesdays, 6:00 PM - 8:00 PM"
   },
   {
-    id: 13,
+    id: 17,
     title: "Fabrication & Product Design",
     description: "Learn how to design and fabricate everyday products using modern tools like 3D printers, CNC machines, and textiles. Students will explore wearable tech concepts such as hybrid shoes with GPS tracking, custom clothing, and community-use devices. This course emphasizes how to build not just products, but also the tools for production.",
     category: "Manufacturing",
@@ -258,7 +264,7 @@ const courses = [
     classTime: "Fridays, 6:00 PM - 8:30 PM"
   },
   {
-    id: 14,
+    id: 5,
     title: "Automotive Design & Fabrication",
     description: "A hands-on workshop for designing and building new vehicles from the ground up. Unlike the car maintenance course, this class focuses on innovation: designing lightweight chassis, experimenting with hybrid or electric drivetrains, and fabricating components in-house.",
     category: "Transportation Innovation",
@@ -277,7 +283,7 @@ const courses = [
     classTime: "Saturdays, 9:00 AM - 12:00 PM"
   },
   {
-    id: 15,
+    id: 16,
     title: "Juice & Food Manufacturing",
     description: "Learn how to design and operate small-scale juice and food manufacturing processes, from sourcing ingredients to packaging and community distribution.",
     category: "Manufacturing",
@@ -293,6 +299,139 @@ const courses = [
     location: "BEAM Food Lab",
     startDate: "2024-09-22",
     endDate: "2024-12-15",
+    classTime: "Sundays, 2:00 PM - 4:00 PM"
+  },
+  {
+    id: 18,
+    title: "Beginning French & Creole",
+    description: "Introductory course covering conversational French with a focus on Haitian Creole. Designed for BEAM participants to bridge language and culture in global and diaspora communities.",
+    category: "Languages",
+    price: "Free (unlocked through community donations)",
+    duration: "12 weeks (1.5 hrs / session)",
+    students: 0,
+    rating: 4.6,
+    instructor: "Language & Culture Specialist",
+    level: "Beginner",
+    featured: false,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    videoUrl: null,
+    location: "BEAM Language Lab",
+    startDate: "2024-09-23",
+    endDate: "2024-12-16",
+    classTime: "Mondays, 6:00 PM - 7:30 PM"
+  },
+  {
+    id: 19,
+    title: "Beginning Architecture",
+    description: "Foundational skills in architectural thinking, drawing, and spatial design.",
+    category: "Design & Built Environment",
+    price: "Free (unlocked through community donations)",
+    duration: "14 weeks (2 hrs / session)",
+    students: 0,
+    rating: 4.7,
+    instructor: "Architectural Designer / Urban Planner",
+    level: "Beginner",
+    featured: true,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    videoUrl: null,
+    location: "BEAM Design Studio",
+    startDate: "2024-09-24",
+    endDate: "2024-12-24",
+    classTime: "Tuesdays, 6:00 PM - 8:00 PM"
+  },
+  {
+    id: 20,
+    title: "Beginning Drawing",
+    description: "Fundamentals of drawing techniques, line, shading, and composition.",
+    category: "Visual Arts",
+    price: "Free (unlocked through community donations)",
+    duration: "10 weeks (1.5 hrs / session)",
+    students: 0,
+    rating: 4.5,
+    instructor: "Visual Artist / Art Educator",
+    level: "Beginner",
+    featured: false,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    videoUrl: null,
+    location: "BEAM Art Studio",
+    startDate: "2024-09-25",
+    endDate: "2024-12-04",
+    classTime: "Wednesdays, 6:00 PM - 7:30 PM"
+  },
+  {
+    id: 21,
+    title: "Beginning Interior Design",
+    description: "Basics of interior design, space planning, and sustainable material selection.",
+    category: "Design & Built Environment",
+    price: "Free (unlocked through community donations)",
+    duration: "12 weeks (2 hrs / session)",
+    students: 0,
+    rating: 4.6,
+    instructor: "Interior Designer / Sustainability Specialist",
+    level: "Beginner",
+    featured: false,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    videoUrl: null,
+    location: "BEAM Design Studio",
+    startDate: "2024-09-26",
+    endDate: "2024-12-19",
+    classTime: "Thursdays, 6:00 PM - 8:00 PM"
+  },
+  {
+    id: 22,
+    title: "Real Estate Attorney Law",
+    description: "Course exploring real estate law, contracts, and compliance.",
+    category: "Legal & Governance",
+    price: "Free (unlocked through community donations)",
+    duration: "16 weeks (2.5 hrs / session)",
+    students: 0,
+    rating: 4.8,
+    instructor: "Real Estate Attorney / Legal Educator",
+    level: "Intermediate",
+    featured: true,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    videoUrl: null,
+    location: "BEAM Legal Center",
+    startDate: "2024-09-27",
+    endDate: "2025-01-17",
+    classTime: "Fridays, 6:00 PM - 8:30 PM"
+  },
+  {
+    id: 23,
+    title: "Governance",
+    description: "Introductory principles of governance, democracy, and cooperative structures.",
+    category: "Leadership & Civic Studies",
+    price: "Free (unlocked through community donations)",
+    duration: "10 weeks (2 hrs / session)",
+    students: 0,
+    rating: 4.7,
+    instructor: "Governance Specialist / Civic Educator",
+    level: "Beginner",
+    featured: true,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    videoUrl: null,
+    location: "BEAM Civic Center",
+    startDate: "2024-09-28",
+    endDate: "2024-12-07",
+    classTime: "Saturdays, 10:00 AM - 12:00 PM"
+  },
+  {
+    id: 24,
+    title: "Accounting",
+    description: "Accounting principles with hands-on application in nonprofit and cooperative settings.",
+    category: "Finance & Productivity",
+    price: "Free (unlocked through community donations)",
+    duration: "14 weeks (2 hrs / session)",
+    students: 0,
+    rating: 4.6,
+    instructor: "Certified Accountant / Financial Educator",
+    level: "Beginner",
+    featured: false,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    videoUrl: null,
+    location: "BEAM Financial Center",
+    startDate: "2024-09-29",
+    endDate: "2024-12-29",
     classTime: "Sundays, 2:00 PM - 4:00 PM"
   }
 ]
@@ -339,6 +478,7 @@ export default function CoursesPage() {
     const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          course.description.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesPrice = priceFilter.includes('Free (Community Funded)') || 
+                        priceFilter.includes('Free (unlocked through community donations)') ||
                         priceFilter.includes('Sponsored Programs')
     const matchesLevel = levelFilter.includes(course.level)
     
@@ -360,11 +500,15 @@ export default function CoursesPage() {
     }
   })
 
-  const handleEnroll = async (courseId: number) => {
+    const handleEnroll = async (courseId: number) => {
     if (!user) {
-      setToastMessage('Please sign in to enroll in courses')
+      setToastMessage('Please sign in with Google to enroll in courses')
       setToastType('error')
       setShowToast(true)
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        window.location.href = '/login'
+      }, 2000)
       return
     }
 
@@ -378,33 +522,113 @@ export default function CoursesPage() {
         return
       }
 
+      // First, ensure user profile exists
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          email: user.email,
+          first_name: user.user_metadata?.full_name?.split(' ')[0] || '',
+          last_name: user.user_metadata?.full_name?.split(' ')[1] || '',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'id' })
+
+      if (profileError) {
+        console.error('Profile creation error:', profileError)
+        throw profileError
+      }
+
       // Create enrollment
       const { error } = await supabase
         .from('enrollments')
         .insert({
           user_id: user.id,
           course_id: courseId,
-          status: 'pending',
-          attendance_mode: 'in-person'
+          status: 'pending'
         })
 
       if (error) throw error
 
-      // Update local state
+      // Update local state immediately
       setEnrolledCourses(prev => [...prev, courseId])
-      
+
       // Show success message
-      setToastMessage('Successfully enrolled in course! Check your dashboard.')
+      setToastMessage('Successfully enrolled! Redirecting to dashboard...')
       setToastType('success')
       setShowToast(true)
 
+      // Store the enrolled course ID in sessionStorage for immediate dashboard access
+      sessionStorage.setItem('justEnrolled', courseId.toString())
+
+      // Also store in localStorage as a backup
+      localStorage.setItem('justEnrolled', courseId.toString())
+
+      // Redirect to dashboard after a short delay
+      setTimeout(() => {
+        window.location.href = '/dashboard'
+      }, 1500)
+
     } catch (error) {
       console.error('Enrollment error:', error)
-      setToastMessage('Failed to enroll. Please try again.')
+      console.error('Error details:', {
+        userId: user?.id,
+        courseId,
+        error: error
+      })
+      
+      // More specific error messages
+      let errorMessage = 'Failed to enroll. Please try again.'
+      if (error && typeof error === 'object' && 'code' in error && error.code === '23503') {
+        errorMessage = 'Database constraint error. Please contact support.'
+      } else if (error && typeof error === 'object' && 'message' in error && error.message) {
+        errorMessage = `Enrollment failed: ${error.message}`
+      }
+      
+      setToastMessage(errorMessage)
       setToastType('error')
       setShowToast(true)
     } finally {
       setEnrolling(null)
+    }
+  }
+
+  const handleRemoveCourse = async (courseId: number) => {
+    if (!user) {
+      setToastMessage('Please sign in to manage courses')
+      setToastType('error')
+      setShowToast(true)
+      return
+    }
+
+    try {
+      // Remove enrollment from database
+      const { error } = await supabase
+        .from('enrollments')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('course_id', courseId)
+
+      if (error) throw error
+
+      // Update local state
+      setEnrolledCourses(prev => prev.filter(id => id !== courseId))
+
+      // Show success message
+      setToastMessage('Course removed successfully!')
+      setToastType('success')
+      setShowToast(true)
+
+      // Force refresh of user data to sync with dashboard
+      setTimeout(() => {
+        window.location.href = '/dashboard'
+      }, 1500)
+
+    } catch (error) {
+      console.error('Remove course error:', error)
+      setToastMessage('Failed to remove course. Please try again.')
+      setToastType('error')
+      setShowToast(true)
     }
   }
 
@@ -536,23 +760,38 @@ export default function CoursesPage() {
                       
                       {/* Auth Links */}
                       <div className="px-4 py-2">
-                        <Link 
-                          href="/login" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
-                          onClick={closeSkillsDropdown}
-                        >
-                          <LogIn className="h-5 w-5" />
-                          <span className="font-satoshi font-medium">Sign In</span>
-                        </Link>
-                        
-                        <Link 
-                          href="/register" 
-                          className="flex items-center space-x-3 px-3 py-3 text-[#7A3B3B] hover:text-[#6A2B2B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
-                          onClick={closeSkillsDropdown}
-                        >
-                          <UserPlus className="h-5 w-5" />
-                          <span className="font-satoshi font-medium">Get Started</span>
-                        </Link>
+                        {user ? (
+                          <button
+                            onClick={async () => {
+                              await supabase.auth.signOut()
+                              window.location.href = '/'
+                            }}
+                            className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200 w-full text-left"
+                          >
+                            <LogIn className="h-5 w-5" />
+                            <span className="font-satoshi font-medium">Sign Out</span>
+                          </button>
+                        ) : (
+                          <>
+                            <Link 
+                              href="/login" 
+                              className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                              onClick={closeSkillsDropdown}
+                            >
+                              <LogIn className="h-5 w-5" />
+                              <span className="font-satoshi font-medium">Sign In</span>
+                            </Link>
+                            
+                            <Link 
+                              href="/register" 
+                              className="flex items-center space-x-3 px-3 py-3 text-[#7A3B3B] hover:text-[#6A2B2B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                              onClick={closeSkillsDropdown}
+                            >
+                              <UserPlus className="h-5 w-5" />
+                              <span className="font-satoshi font-medium">Get Started</span>
+                            </Link>
+                          </>
+                        )}
                       </div>
                     </motion.div>
                   </>
@@ -745,8 +984,53 @@ export default function CoursesPage() {
                         )}
                       </div>
                       
+                                                  {/* Quick Add Button or Enrolled Status */}
+                            {!enrolledCourses.includes(course.id) ? (
+                              <div className="absolute top-4 left-4">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEnroll(course.id)
+                                  }}
+                                  disabled={enrolling === course.id}
+                                  className="inline-flex items-center gap-1 px-2 py-1 text-xs text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors shadow-sm"
+                                  title="Quick add to your courses"
+                                >
+                                  {enrolling === course.id ? (
+                                    <>
+                                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
+                                      <span>Adding...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Plus className="h-3 w-3" />
+                                      <span>Quick Add</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="absolute top-4 left-4">
+                                <div className="inline-flex items-center gap-1 px-2 py-1 text-xs text-white bg-green-600 rounded-md shadow-sm">
+                                  <CheckCircle className="h-3 w-3" />
+                                  <span>Enrolled</span>
+                                </div>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleRemoveCourse(course.id)
+                                  }}
+                                  className="mt-2 inline-flex items-center gap-1 px-2 py-1 text-xs text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors shadow-sm"
+                                  title="Remove from courses"
+                                >
+                                  <X className="h-3 w-3" />
+                                  <span>Remove</span>
+                                </button>
+                              </div>
+                            )}
+                      
                       {/* Action Icons */}
-                      <div className="absolute top-4 left-4 flex flex-col gap-2">
+                      <div className="absolute top-4 left-4 flex flex-col gap-2" style={{ top: !enrolledCourses.includes(course.id) ? '6rem' : '4rem' }}>
                         <motion.div 
                           className="w-10 h-10 bg-[#7A3B3B] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#6A2B2B] transition-colors"
                           whileHover={{ scale: 1.1 }}
@@ -907,6 +1191,7 @@ export default function CoursesPage() {
                                 Details
                               </Link>
                             </div>
+                            
                           </div>
                         </motion.div>
                       )}
