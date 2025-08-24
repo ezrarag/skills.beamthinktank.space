@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import SetupGuide from '../components/SetupGuide'
+import { removeCourseEnrollment } from '@/lib/courseManagement'
+import { addToGoogleCalendar, createCourseCalendarEvent } from '@/lib/calendarIntegration'
 import { 
   Brain, 
   BookOpen, 
@@ -458,16 +460,11 @@ export default function DashboardPage() {
     try {
       console.log('🗑️ REMOVE: Removing course:', courseId)
       
-      // Remove enrollment from database
-      const { error } = await supabase
-        .from('enrollments')
-        .delete()
-        .eq('user_id', userData.id)
-        .eq('course_id', courseId)
-
-      if (error) {
-        console.error('❌ REMOVE: Error removing course:', error)
-        throw error
+      // Use the unified course management utility
+      const success = await removeCourseEnrollment(userData.id, courseId)
+      
+      if (!success) {
+        throw new Error('Failed to remove course enrollment')
       }
 
       // Update local state - remove the course from enrolledCourses
@@ -877,18 +874,18 @@ export default function DashboardPage() {
                               ></div>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-4">
-                            <span className={`text-sm font-medium ${getProgressColor(course.progress)}`}>
-                              {course.progress}% Complete
-                            </span>
-                            <button
-                              onClick={() => handleRemoveCourse(course.id)}
-                              className="px-3 py-1 text-xs text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
-                              title="Remove course"
-                            >
-                              Remove
-                            </button>
-                          </div>
+                                                  <div className="flex items-center space-x-4">
+                          <span className="text-sm font-medium text-gray-600">
+                            Not Started Yet
+                          </span>
+                          <button
+                            onClick={() => handleRemoveCourse(course.id)}
+                            className="px-3 py-1 text-xs text-white bg-red-600 hover:bg-red-700 rounded-md transition-colors"
+                            title="Remove course"
+                          >
+                            Remove
+                          </button>
+                        </div>
                         </div>
                       </div>
                     ))}
@@ -937,7 +934,20 @@ export default function DashboardPage() {
                             <button className="btn-primary">
                               Join Session
                             </button>
-                            <button className="btn-secondary">
+                            <button 
+                              onClick={() => {
+                                const event = createCourseCalendarEvent(
+                                  session.course,
+                                  session.time,
+                                  session.location,
+                                  session.instructor
+                                )
+                                if (event) {
+                                  addToGoogleCalendar(event)
+                                }
+                              }}
+                              className="btn-secondary"
+                            >
                               Add to Calendar
                             </button>
                           </div>

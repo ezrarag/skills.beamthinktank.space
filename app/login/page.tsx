@@ -26,7 +26,7 @@ export default function LoginPage() {
       await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : undefined
+          redirectTo: `${window.location.origin}/dashboard`
         }
       })
     } catch (e) {

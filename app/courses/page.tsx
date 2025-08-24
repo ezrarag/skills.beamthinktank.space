@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { BookOpen, Clock, Users, Star, Filter, Search, Heart, ArrowRight, Lightbulb, ExternalLink, ChevronDown, ChevronUp, Brain, Calendar, Award, LogIn, UserPlus, Hammer, BarChart3, CheckCircle, Plus, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import Toast from '../components/Toast'
+import { removeCourseEnrollment } from '@/lib/courseManagement'
 
 const categories = [
   'All',
@@ -123,7 +124,7 @@ const courses = [
     instructor: "Audio Engineer / Advanced Musician",
     level: "Intermediate",
     featured: false,
-    imageUrl: "/images/courses/audio-recording.jpg", // Placeholder for audio recording image
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-cristian-rojas-7586662.jpg", // Placeholder for audio recording image
     videoUrl: null,
     location: "Cleveland Ave Library",
     startDate: "2024-09-12",
@@ -161,7 +162,7 @@ const courses = [
     instructor: "Vocal Coach / Mentor",
     level: "Beginner",
     featured: false,
-    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-cristian-rojas-7586662.jpg", // Placeholder for voice training image
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-cottonbro-7520371.jpg", // Placeholder for voice training image
     videoUrl: null,
     location: "Cleveland Ave Library",
     startDate: "2024-09-14",
@@ -199,7 +200,7 @@ const courses = [
     instructor: "Experienced Entrepreneur / Business Mentor",
     level: "Intermediate",
     featured: false,
-    imageUrl: "/images/courses/entrepreneurship.jpg", // Placeholder for entrepreneurship image
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-rethaferguson-3811082.jpg", // Placeholder for entrepreneurship image
     videoUrl: null,
     location: "Cleveland Ave Library",
     startDate: "2024-09-16",
@@ -218,7 +219,7 @@ const courses = [
     instructor: "Real Estate Developer / Finance Mentor",
     level: "Advanced",
     featured: false,
-    imageUrl: "/images/courses/real-estate.jpg", // Placeholder for real estate image
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-pavel-danilyuk-7937356.jpg", // Placeholder for real estate image
     videoUrl: null,
     location: "Cleveland Ave Library",
     startDate: "2024-09-17",
@@ -237,7 +238,7 @@ const courses = [
     instructor: "Crypto Professional / Fintech Mentor",
     level: "Intermediate",
     featured: false,
-    imageUrl: "/images/courses/cryptocurrency.jpg", // Placeholder for crypto image
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-worldspectrum-844124.jpg", // Placeholder for crypto image
     videoUrl: null,
     location: "Cleveland Ave Library",
     startDate: "2024-09-18",
@@ -256,7 +257,7 @@ const courses = [
     instructor: "Product Design Engineer / Fabrication Specialist",
     level: "Intermediate",
     featured: true,
-    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg", // Placeholder for fabrication image
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kateryna-babaieva-1423213-2965260.jpg", // Placeholder for fabrication image
     videoUrl: null,
     location: "BEAM Innovation Lab",
     startDate: "2024-09-20",
@@ -294,7 +295,7 @@ const courses = [
     instructor: "Food Safety Specialist / Manufacturing Expert",
     level: "Beginner",
     featured: false,
-    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg", // Placeholder for food manufacturing image
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-polina-tankilevitch-4443492%20(1).jpg", // Placeholder for food manufacturing image
     videoUrl: null,
     location: "BEAM Food Lab",
     startDate: "2024-09-22",
@@ -313,7 +314,7 @@ const courses = [
     instructor: "Language & Culture Specialist",
     level: "Beginner",
     featured: false,
-    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-g-star-media-2150953934-31876709.jpg",
     videoUrl: null,
     location: "BEAM Language Lab",
     startDate: "2024-09-23",
@@ -332,7 +333,7 @@ const courses = [
     instructor: "Architectural Designer / Urban Planner",
     level: "Beginner",
     featured: true,
-    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-pixabay-256150.jpg",
     videoUrl: null,
     location: "BEAM Design Studio",
     startDate: "2024-09-24",
@@ -351,7 +352,7 @@ const courses = [
     instructor: "Visual Artist / Art Educator",
     level: "Beginner",
     featured: false,
-    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-artempodrez-6990443.jpg",
     videoUrl: null,
     location: "BEAM Art Studio",
     startDate: "2024-09-25",
@@ -370,7 +371,7 @@ const courses = [
     instructor: "Interior Designer / Sustainability Specialist",
     level: "Beginner",
     featured: false,
-    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-fotoaibe-1571460.jpg",
     videoUrl: null,
     location: "BEAM Design Studio",
     startDate: "2024-09-26",
@@ -389,7 +390,7 @@ const courses = [
     instructor: "Real Estate Attorney / Legal Educator",
     level: "Intermediate",
     featured: true,
-    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-markus-winkler-1430818-19783681.jpg",
     videoUrl: null,
     location: "BEAM Legal Center",
     startDate: "2024-09-27",
@@ -408,7 +409,7 @@ const courses = [
     instructor: "Governance Specialist / Civic Educator",
     level: "Beginner",
     featured: true,
-    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-markus-winkler-1430818-19783681.jpg",
     videoUrl: null,
     location: "BEAM Civic Center",
     startDate: "2024-09-28",
@@ -427,12 +428,31 @@ const courses = [
     instructor: "Certified Accountant / Financial Educator",
     level: "Beginner",
     featured: false,
-    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-kampus-7983552.jpg",
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-tima-miroshnichenko-6694570.jpg",
     videoUrl: null,
     location: "BEAM Financial Center",
     startDate: "2024-09-29",
     endDate: "2024-12-29",
     classTime: "Sundays, 2:00 PM - 4:00 PM"
+  },
+  {
+    id: 25,
+    title: "Collaborative Piano: Introduction to Accompaniment",
+    description: "This course introduces pianists to the art of collaborative piano, with a focus on working alongside singers, dancers, and other instrumentalists. Students will learn listening skills, score reading, and rehearsal techniques that prepare them for real-world musical partnerships.",
+    category: "Arts & Music",
+    price: "Free (unlocked through community donations)",
+    duration: "8 weeks (1.5 hrs / session)",
+    students: 0,
+    rating: 4.8,
+    instructor: "Professional Collaborative Pianist / Music Educator",
+    level: "Beginner",
+    featured: false,
+    imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-tima-miroshnichenko-6694570.jpg",
+    videoUrl: null,
+    location: "BEAM Music Studio",
+    startDate: "2024-09-15",
+    endDate: "2024-11-03",
+    classTime: "Sundays, 3:00 PM - 4:30 PM"
   }
 ]
 
@@ -478,7 +498,7 @@ export default function CoursesPage() {
     const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          course.description.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesPrice = priceFilter.includes('Free (Community Funded)') || 
-                        priceFilter.includes('Free (unlocked through community donations)') ||
+                        course.price === 'Free (unlocked through community donations)' ||
                         priceFilter.includes('Sponsored Programs')
     const matchesLevel = levelFilter.includes(course.level)
     
@@ -602,14 +622,12 @@ export default function CoursesPage() {
     }
 
     try {
-      // Remove enrollment from database
-      const { error } = await supabase
-        .from('enrollments')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('course_id', courseId)
-
-      if (error) throw error
+      // Use the unified course management utility
+      const success = await removeCourseEnrollment(user.id, courseId)
+      
+      if (!success) {
+        throw new Error('Failed to remove course enrollment')
+      }
 
       // Update local state
       setEnrolledCourses(prev => prev.filter(id => id !== courseId))

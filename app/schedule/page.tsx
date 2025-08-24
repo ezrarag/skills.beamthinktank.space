@@ -336,6 +336,21 @@ const scheduleData = [
     price: "Free (unlocked through community donations)",
     featured: false,
     courseId: 24
+  },
+  {
+    id: 25,
+    course: "Collaborative Piano: Introduction to Accompaniment",
+    instructor: "Professional Collaborative Pianist / Music Educator",
+    date: "2024-09-15",
+    time: "3:00 PM - 4:30 PM",
+    duration: 1.5,
+    location: "BEAM Music Studio",
+    maxStudents: 12,
+    enrolledStudents: 0,
+    category: "Arts & Music",
+    price: "Free (unlocked through community donations)",
+    featured: false,
+    courseId: 25
   }
 ]
 

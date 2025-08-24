@@ -248,6 +248,17 @@ const instructors = [
     students: 0,
     yearsExperience: 9,
     featured: false
+  },
+  {
+    id: 25,
+    name: "Professional Collaborative Pianist / Music Educator",
+    specialty: "Arts & Music",
+    bio: "Experienced collaborative pianist with expertise in vocal and instrumental accompaniment. Specializes in teaching ensemble skills and musical partnership techniques.",
+    rating: 4.8,
+    courses: 1,
+    students: 0,
+    yearsExperience: 12,
+    featured: false
   }
 ]
 
