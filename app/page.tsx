@@ -3,10 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Brain, ChevronDown, ChevronUp, BookOpen, Users, Calendar, Award, LogIn, UserPlus, X, Hammer, BarChart3 } from 'lucide-react'
+import { Brain, ChevronDown, ChevronUp, BookOpen, Users, Calendar, Award, LogIn, UserPlus, X, Hammer, BarChart3, MapPin, MapPinOff } from 'lucide-react'
+import { useLocation } from './components/LocationProvider'
 
 export default function HomePage() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const { city, isLocationEnabled, enableLocation, disableLocation } = useLocation()
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen)
@@ -22,9 +24,19 @@ export default function HomePage() {
       <nav className="sticky top-0 z-50 backdrop-blur-sm bg-white/10">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            {/* Left - Skill Icon */}
-            <div className="flex items-center">
+            {/* Left - Skill Icon and City */}
+            <div className="flex items-center space-x-3">
               <Brain className="h-8 w-8 text-[#7A3B3B]" />
+              {isLocationEnabled && city && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-center space-x-2 text-[#7A3B3B] font-medium"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span className="text-sm">{city}</span>
+                </motion.div>
+              )}
             </div>
             
             {/* Right - Dropdown Button */}
@@ -106,7 +118,7 @@ export default function HomePage() {
                         
                         <Link 
                           href="/dashboard" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
                           onClick={closeDropdown}
                         >
                           <BarChart3 className="h-5 w-5" />
@@ -114,11 +126,19 @@ export default function HomePage() {
                         </Link>
                         <Link 
                           href="/qr" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
                           onClick={closeDropdown}
                         >
                           <Calendar className="h-5 w-5" />
                           <span className="font-satoshi font-medium">Scan QR</span>
+                        </Link>
+                        <Link 
+                          href="/partners" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
+                          onClick={closeDropdown}
+                        >
+                          <Users className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Partners</span>
                         </Link>
                       </div>
                       
@@ -129,7 +149,7 @@ export default function HomePage() {
                       <div className="px-4 py-2">
                         <Link 
                           href="/login" 
-                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
                           onClick={closeDropdown}
                         >
                           <LogIn className="h-5 w-5" />
@@ -171,6 +191,35 @@ export default function HomePage() {
                 <Link href="/courses" className="bg-[#7A3B3B] hover:bg-[#6A2B2B] text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi">
                   Browse Courses
                 </Link>
+                
+                {/* Location Button */}
+                {!isLocationEnabled ? (
+                  <motion.button
+                    onClick={enableLocation}
+                    className="relative bg-[#7A3B3B] hover:bg-[#6A2B2B] text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi flex items-center space-x-3"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-[#9A5B5B] rounded-full p-1"></div>
+                      <MapPin className="h-6 w-6 relative z-10" />
+                    </div>
+                    <span>Enable Location</span>
+                  </motion.button>
+                ) : (
+                  <motion.button
+                    onClick={disableLocation}
+                    className="relative bg-gray-500 hover:bg-gray-600 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi flex items-center space-x-3"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-[#9A5B5B] rounded-full p-1"></div>
+                      <MapPinOff className="h-6 w-6 relative z-10" />
+                    </div>
+                    <span>Disable Location</span>
+                  </motion.button>
+                )}
               </div>
             </div>
             

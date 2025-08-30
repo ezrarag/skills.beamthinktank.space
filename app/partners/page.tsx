@@ -1,0 +1,430 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Brain, ChevronDown, ChevronUp, BookOpen, Users, Calendar, Award, LogIn, UserPlus, X, Hammer, BarChart3, MapPin, MapPinOff, ArrowLeft, Building2, Phone, Mail, Globe, Clock, MapPin as MapPinIcon, Plus } from 'lucide-react'
+import { useLocation } from '../components/LocationProvider'
+
+export default function PartnersPage() {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const { city, isLocationEnabled } = useLocation()
+  const [partnerships, setPartnerships] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchPartnerships()
+  }, [])
+
+  const fetchPartnerships = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch('/api/partners')
+      if (response.ok) {
+        const data = await response.json()
+        setPartnerships(data.partnerships || [])
+      }
+    } catch (error) {
+      console.error('Error fetching partnerships:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen)
+  }
+
+  const closeDropdown = () => {
+    setIsDropdownOpen(false)
+  }
+
+  const institutions = [
+    {
+      id: 1,
+      name: "Cleveland Ave Library",
+      address: "47 Cleveland Avenue SW, Atlanta, GA 30315",
+      phone: "(404) 762-4000",
+      email: "cleveland@fulcolibrary.org",
+      website: "https://www.fulcolibrary.org/locations/cleve/",
+      hours: "Mon-Tue: 10AM-8PM, Wed-Sat: 10AM-6PM, Sun: Closed",
+      description: "A welcoming community library offering educational programs, computer access, and meeting spaces for skill-building workshops.",
+      imageUrl: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      courses: ["Intro to Tech for All Ages", "Planting & Houseplants", "Emergency Health Skills"],
+      capacity: "25-30 people",
+      amenities: ["Free WiFi", "Meeting Rooms", "Computer Lab", "Parking", "Accessible"]
+    },
+    {
+      id: 2,
+      name: "Coconut Grove Branch Library",
+      address: "2875 McFarlane Rd, Miami, FL 33133",
+      phone: "(305) 442-8695",
+      email: "customercare@mdpls.org",
+      website: "https://mdpls.org/branch-coconut-grove",
+      hours: "Mon-Thu: 9:30AM-8PM, Fri-Sat: 9:30AM-6PM, Sun: Closed",
+      description: "A vibrant community library in the heart of Coconut Grove offering diverse programs, technology access, and welcoming spaces for learning and community engagement.",
+      imageUrl: "https://images.unsplash.com/photo-1577412647305-991150c7d163?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      courses: ["Digital Literacy", "Creative Arts", "Language Learning", "STEM Activities"],
+      capacity: "20-25 people",
+      amenities: ["Mobile Printing", "Computer Access", "Meeting Rooms", "Free WiFi", "Accessible"]
+    }
+  ]
+
+  // Combine hardcoded institutions with approved partnerships from database
+  const approvedPartnerships = partnerships
+    .filter(p => p.status === 'approved')
+    .map(p => ({
+      id: `db-${p.id}`,
+      name: p.institution_name,
+      address: p.address,
+      phone: p.phone || "Contact via email",
+      email: p.email,
+      website: p.website || "#",
+      hours: "To be determined",
+      description: `Partner institution offering selected courses. ${p.message || ''}`,
+      imageUrl: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      courses: p.selected_courses,
+      capacity: "To be determined",
+      amenities: ["Meeting Spaces", "Community Focus"],
+      isNewPartner: true,
+      isApproved: true
+    }))
+
+  const allInstitutions = [...institutions, ...approvedPartnerships]
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#FFFFF] via-[#FAFAFA] to-[#FFFFFF]">
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 backdrop-blur-sm bg-white/10">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            {/* Left - Skill Icon and City */}
+            <div className="flex items-center space-x-3">
+              <Brain className="h-8 w-8 text-[#7A3B3B]" />
+              {isLocationEnabled && city && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-center space-x-2 text-[#7A3B3B] font-medium"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span className="text-sm">{city}</span>
+                </motion.div>
+              )}
+            </div>
+            
+            {/* Right - Dropdown Button */}
+            <div className="relative">
+              <motion.button
+                onClick={toggleDropdown}
+                className="flex items-center space-x-2 bg-[#7A3B3B] hover:bg-[#6A2B2B] text-white font-medium px-6 py-3 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Hammer className="h-5 w-5" />
+                <span className="font-satoshi">Partners</span>
+                <motion.div
+                  animate={{ rotate: isDropdownOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <ChevronDown className="h-5 w-5" />
+                </motion.div>
+              </motion.button>
+
+              {/* Dropdown Menu */}
+              <AnimatePresence>
+                {isDropdownOpen && (
+                  <>
+                    {/* Backdrop */}
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="fixed inset-0 z-40"
+                      onClick={closeDropdown}
+                    />
+                    
+                    {/* Dropdown Content */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                      transition={{ duration: 0.2, ease: "easeOut" }}
+                      className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-gray-200 py-2 z-50"
+                    >
+                      {/* Navigation Links */}
+                      <div className="px-4 py-2">
+                        <Link 
+                          href="/" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
+                          onClick={closeDropdown}
+                        >
+                          <Hammer className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Home</span>
+                        </Link>
+                        <Link 
+                          href="/courses" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
+                          onClick={closeDropdown}
+                        >
+                          <BookOpen className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Courses</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/instructors" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
+                          onClick={closeDropdown}
+                        >
+                          <Users className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Instructors</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/schedule" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
+                          onClick={closeDropdown}
+                        >
+                          <Calendar className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Schedule</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/certifications" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
+                          onClick={closeDropdown}
+                        >
+                          <Award className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Certifications</span>
+                        </Link>
+                        
+                        <Link 
+                          href="/dashboard" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
+                          onClick={closeDropdown}
+                        >
+                          <BarChart3 className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Dashboard</span>
+                        </Link>
+                        <Link 
+                          href="/qr" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
+                          onClick={closeDropdown}
+                        >
+                          <Calendar className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Scan QR</span>
+                        </Link>
+                      </div>
+                      
+                      {/* Divider */}
+                      <div className="border-t border-gray-200 my-2" />
+                      
+                      {/* Auth Links */}
+                      <div className="px-4 py-2">
+                        <Link 
+                          href="/login" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white rounded-xl transition-all duration-200"
+                          onClick={closeDropdown}
+                        >
+                          <LogIn className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Sign In</span>
+                        </Link>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Header Section */}
+      <section className="py-16 bg-gradient-to-r from-[#7A3B3B]/10 to-[#6A2B2B]/10">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center space-x-4 mb-8">
+            <Link 
+              href="/"
+              className="flex items-center space-x-2 text-[#7A3B3B] hover:text-[#6A2B2B] transition-colors duration-200"
+            >
+              <ArrowLeft className="h-5 w-5" />
+              <span className="font-satoshi font-medium">Back to Home</span>
+            </Link>
+          </div>
+          
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl font-normal text-[#7A3B3B] mb-6 leading-tight font-satoshi">
+              Our Partners
+            </h1>
+            <p className="text-lg text-[#7A3B3B]/80 max-w-3xl mx-auto font-satoshi">
+              Discover the institutions and community spaces where our skill-building courses come to life. 
+              These partners provide the physical spaces and resources that make learning accessible to everyone.
+            </p>
+          </div>
+        </div>
+      </section>
+
+                        {/* Institutions Grid */}
+                  <section className="py-16">
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                      {loading ? (
+                        <div className="text-center py-12">
+                          <div className="w-8 h-8 border-2 border-[#7A3B3B] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                          <p className="text-gray-600">Loading partnerships...</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {allInstitutions.map((institution, index) => (
+              <motion.div
+                key={institution.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 ${
+                  institution.isNewPartner ? 'ring-2 ring-[#7A3B3B] ring-opacity-50' : ''
+                }`}
+              >
+                {/* Image */}
+                <div className="h-48 overflow-hidden relative">
+                  <img 
+                    src={institution.imageUrl}
+                    alt={institution.name}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                  {institution.isNewPartner && (
+                    <div className="absolute top-4 right-4 bg-[#7A3B3B] text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                      <Plus className="h-3 w-3" />
+                      <span>New Partner</span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Content */}
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-2xl font-semibold text-[#7A3B3B] font-satoshi">
+                      {institution.name}
+                    </h3>
+                    <Building2 className="h-6 w-6 text-[#7A3B3B]" />
+                  </div>
+                  
+                  <p className="text-gray-600 mb-4 font-satoshi">
+                    {institution.description}
+                  </p>
+                  
+                  {/* Contact Info */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <MapPinIcon className="h-4 w-4 text-[#7A3B3B]" />
+                      <span className="text-sm">{institution.address}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <Phone className="h-4 w-4 text-[#7A3B3B]" />
+                      <span className="text-sm">{institution.phone}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <Mail className="h-4 w-4 text-[#7A3B3B]" />
+                      <span className="text-sm">{institution.email}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <Clock className="h-4 w-4 text-[#7A3B3B]" />
+                      <span className="text-sm">{institution.hours}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Courses */}
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-[#7A3B3B] mb-2 font-satoshi">Available Courses:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {institution.courses.map((course, courseIndex) => (
+                        <span 
+                          key={courseIndex}
+                          className={`px-3 py-1 rounded-full text-sm font-satoshi ${
+                            institution.isNewPartner 
+                              ? 'bg-[#7A3B3B] text-white' 
+                              : 'bg-[#7A3B3B]/10 text-[#7A3B3B]'
+                          }`}
+                        >
+                          {course}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Amenities */}
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-[#7A3B3B] mb-2 font-satoshi">Amenities:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {institution.amenities.map((amenity, amenityIndex) => (
+                        <span 
+                          key={amenityIndex}
+                          className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-satoshi"
+                        >
+                          {amenity}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Capacity */}
+                  <div className="mb-4">
+                    <span className="text-sm text-gray-600 font-satoshi">
+                      <strong>Capacity:</strong> {institution.capacity}
+                    </span>
+                  </div>
+                  
+                  {/* Website Link */}
+                  <div className="flex justify-between items-center">
+                    <a 
+                      href={institution.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 text-[#7A3B3B] hover:text-[#6A2B2B] transition-colors duration-200 font-satoshi"
+                    >
+                      <Globe className="h-4 w-4" />
+                      <span>Visit Website</span>
+                    </a>
+                    
+                    <Link 
+                      href="/courses"
+                      className="bg-[#7A3B3B] hover:bg-[#6A2B2B] text-white px-4 py-2 rounded-lg transition-colors duration-200 font-satoshi"
+                    >
+                      View Courses
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+                        </div>
+                      )}
+                    </div>
+          
+          {/* Call to Action */}
+          <div className="text-center mt-16">
+            <h2 className="text-3xl font-semibold text-[#7A3B3B] mb-4 font-satoshi">
+              Want to Partner With Us?
+            </h2>
+            <p className="text-lg text-[#7A3B3B]/80 mb-8 max-w-2xl mx-auto font-satoshi">
+              If you represent an institution that would like to host our skill-building courses, 
+              we'd love to hear from you. Let's work together to strengthen our community.
+            </p>
+                                    <div className="flex flex-col sm:flex-row gap-4">
+                          <Link
+                            href="/contact"
+                            className="bg-[#7A3B3B] hover:bg-[#6A2B2B] text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi inline-block"
+                          >
+                            Become a Partner
+                          </Link>
+                          <Link
+                            href="/partner-login"
+                            className="bg-white border-2 border-[#7A3B3B] text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi inline-block"
+                          >
+                            Partner Login
+                          </Link>
+                        </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}

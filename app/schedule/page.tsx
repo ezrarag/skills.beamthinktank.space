@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar, Clock, Users, MapPin, Filter, ChevronLeft, ChevronRight, Heart, ArrowRight, ChevronDown, ChevronUp, Brain, BookOpen, Award, LogIn, UserPlus, Hammer, BarChart3 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { useLocation } from '../components/LocationProvider'
 
 const scheduleData = [
   {
@@ -393,6 +394,7 @@ export default function SchedulePage() {
   const [isSkillsDropdownOpen, setIsSkillsDropdownOpen] = useState(false)
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [user, setUser] = useState<any>(null)
+  const { city, isLocationEnabled } = useLocation()
 
   // Check user authentication
   useEffect(() => {
@@ -409,7 +411,12 @@ export default function SchedulePage() {
   const filteredSchedule = scheduleData.filter(item => {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory
     const matchesDate = !selectedDate || item.date === selectedDate
-    return matchesCategory && matchesDate
+    
+    // Location-based filtering - if location is enabled, show classes with locations
+    // If no location is enabled, show all classes
+    const matchesLocation = !isLocationEnabled || (item.location && item.location.includes('Library') || item.location && item.location.includes('Center'))
+    
+    return matchesCategory && matchesDate && matchesLocation
   })
 
   const sortedSchedule = [...filteredSchedule].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -448,7 +455,19 @@ export default function SchedulePage() {
       <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white py-20">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex justify-center items-center mb-6">
-            <h1 className="text-4xl md:text-6xl font-bold mb-0 mr-6">Class Schedule</h1>
+            <div className="flex items-center space-x-4">
+              <h1 className="text-4xl md:text-6xl font-bold mb-0">Class Schedule</h1>
+              {isLocationEnabled && city && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-center space-x-2 text-white/90 font-medium bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span className="text-lg">{city}</span>
+                </motion.div>
+              )}
+            </div>
             
             {/* Skills Dropdown Button */}
             <div className="relative">
@@ -534,6 +553,14 @@ export default function SchedulePage() {
                         >
                           <BarChart3 className="h-5 w-5" />
                           <span className="font-satoshi font-medium">Dashboard</span>
+                        </Link>
+                        <Link 
+                          href="/partners" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Users className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Partners</span>
                         </Link>
                       </div>
                       

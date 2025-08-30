@@ -33,6 +33,7 @@ import {
   Search,
   HelpCircle
 } from 'lucide-react'
+import { useLocation } from '../components/LocationProvider'
 
 interface UserData {
   id: string
@@ -89,6 +90,7 @@ export default function DashboardPage() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isSetupGuideOpen, setIsSetupGuideOpen] = useState(false)
   const [loading, setLoading] = useState(true)
+  const { city, isLocationEnabled } = useLocation()
 
   const fetchUserData = async () => {
     try {
@@ -556,6 +558,16 @@ export default function DashboardPage() {
                 <Brain className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">BEAM Skills</span>
+              {isLocationEnabled && city && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-center space-x-2 text-gray-600 font-medium bg-gray-100 px-3 py-1 rounded-full"
+                >
+                  <MapPin className="h-3 w-3" />
+                  <span className="text-sm">{city}</span>
+                </motion.div>
+              )}
             </div>
 
             {/* Navigation */}
@@ -571,6 +583,9 @@ export default function DashboardPage() {
               </Link>
               <Link href="/certifications" className="text-gray-600 hover:text-gray-900 transition-colors">
                 Certifications
+              </Link>
+              <Link href="/partners" className="text-gray-600 hover:text-gray-900 transition-colors">
+                Partners
               </Link>
             </div>
 

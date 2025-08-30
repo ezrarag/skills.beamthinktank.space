@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Users, ChevronDown, ChevronUp, BookOpen, Calendar, Award, LogIn, UserPlus, Hammer, Filter, Star, ArrowRight, Search, BarChart3 } from 'lucide-react'
+import { Users, ChevronDown, ChevronUp, BookOpen, Calendar, Award, LogIn, UserPlus, Hammer, Filter, Star, ArrowRight, Search, BarChart3, MapPin } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
+import { useLocation } from '../components/LocationProvider'
 
 const instructors = [
   {
@@ -294,6 +295,7 @@ export default function InstructorsPage() {
   const [sortBy, setSortBy] = useState('rating')
   const [isSkillsDropdownOpen, setIsSkillsDropdownOpen] = useState(false)
   const [user, setUser] = useState<any>(null)
+  const { city, isLocationEnabled } = useLocation()
 
   // Check user authentication
   useEffect(() => {
@@ -341,7 +343,19 @@ export default function InstructorsPage() {
       <div className="bg-gradient-to-br from-[#7A3B3B] to-[#6A2B2B] text-white py-20">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex justify-center items-center mb-6">
-            <h1 className="text-4xl md:text-6xl font-bold mb-0 mr-6 font-satoshi">Our Instructors</h1>
+            <div className="flex items-center space-x-4">
+              <h1 className="text-4xl md:text-6xl font-bold mb-0 font-satoshi">Our Instructors</h1>
+              {isLocationEnabled && city && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-center space-x-2 text-white/90 font-medium bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span className="text-lg">{city}</span>
+                </motion.div>
+              )}
+            </div>
             
             {/* Skills Dropdown Button */}
             <div className="relative">
@@ -427,6 +441,14 @@ export default function InstructorsPage() {
                         >
                           <BarChart3 className="h-5 w-5" />
                           <span className="font-satoshi font-medium">Dashboard</span>
+                        </Link>
+                        <Link 
+                          href="/partners" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Users className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Partners</span>
                         </Link>
                       </div>
                       

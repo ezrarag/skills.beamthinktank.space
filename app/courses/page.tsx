@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BookOpen, Clock, Users, Star, Filter, Search, Heart, ArrowRight, Lightbulb, ExternalLink, ChevronDown, ChevronUp, Brain, Calendar, Award, LogIn, UserPlus, Hammer, BarChart3, CheckCircle, Plus, X } from 'lucide-react'
+import { BookOpen, Clock, Users, Star, Filter, Search, Heart, ArrowRight, Lightbulb, ExternalLink, ChevronDown, ChevronUp, Brain, Calendar, Award, LogIn, UserPlus, Hammer, BarChart3, CheckCircle, Plus, X, MapPin } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import Toast from '../components/Toast'
 import { removeCourseEnrollment } from '@/lib/courseManagement'
+import { useLocation } from '../components/LocationProvider'
 
 const categories = [
   'All',
@@ -508,6 +509,7 @@ export default function CoursesPage() {
   const [showToast, setShowToast] = useState(false)
   const [toastMessage, setToastMessage] = useState('')
   const [toastType, setToastType] = useState<'success' | 'error'>('success')
+  const { city, isLocationEnabled } = useLocation()
 
   // Check user authentication and fetch enrolled courses
   useEffect(() => {
@@ -540,7 +542,11 @@ export default function CoursesPage() {
                         priceFilter.includes('Sponsored Programs')
     const matchesLevel = levelFilter.includes(course.level)
     
-    return matchesCategory && matchesSearch && matchesPrice && matchesLevel
+    // Location-based filtering - if location is enabled, show courses with locations
+    // If no location is enabled, show all courses
+    const matchesLocation = !isLocationEnabled || (course.location && course.location.includes('Library') || course.location && course.location.includes('Center'))
+    
+    return matchesCategory && matchesSearch && matchesPrice && matchesLevel && matchesLocation
   })
 
   const sortedCourses = [...filteredCourses].sort((a, b) => {
@@ -722,7 +728,19 @@ export default function CoursesPage() {
       <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white py-20">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex justify-center items-center mb-6">
-            <h1 className="text-4xl md:text-6xl font-bold mb-0 mr-6">Browse Courses</h1>
+            <div className="flex items-center space-x-4">
+              <h1 className="text-4xl md:text-6xl font-bold mb-0">Browse Courses</h1>
+              {isLocationEnabled && city && (
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="flex items-center space-x-2 text-white/90 font-medium bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span className="text-lg">{city}</span>
+                </motion.div>
+              )}
+            </div>
             
             {/* Skills Dropdown Button */}
             <div className="relative">
@@ -808,6 +826,14 @@ export default function CoursesPage() {
                         >
                           <BarChart3 className="h-5 w-5" />
                           <span className="font-satoshi font-medium">Dashboard</span>
+                        </Link>
+                        <Link 
+                          href="/partners" 
+                          className="flex items-center space-x-3 px-3 py-3 text-gray-700 hover:text-[#7A3B3B] hover:bg-[#7A3B3B]/10 rounded-xl transition-all duration-200"
+                          onClick={closeSkillsDropdown}
+                        >
+                          <Users className="h-5 w-5" />
+                          <span className="font-satoshi font-medium">Partners</span>
                         </Link>
                       </div>
                       
@@ -949,6 +975,25 @@ export default function CoursesPage() {
                   </label>
                 </div>
               </div>
+
+              {/* Location Filter */}
+              {isLocationEnabled && city && (
+                <div className="mb-8">
+                  <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-primary-600" />
+                    Location
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2 text-gray-600 bg-gray-50 px-3 py-2 rounded-lg">
+                      <MapPin className="h-4 w-4 text-primary-600" />
+                      <span className="text-sm font-medium">{city}</span>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      Showing courses available in your area
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
