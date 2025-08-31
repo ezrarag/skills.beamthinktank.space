@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
+// Force dynamic rendering for OAuth callback
+export const dynamic = 'force-dynamic'
+
 export async function GET(request: NextRequest) {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
   const { searchParams } = new URL(request.url)
   const code = searchParams.get('code')
   const userType = searchParams.get('type')
 
   if (!code) {
-    return NextResponse.redirect(new URL('/register?error=no_code', request.url))
+    return NextResponse.redirect(new URL('/register?error=no_code', baseUrl))
   }
 
   try {
@@ -16,11 +20,11 @@ export async function GET(request: NextRequest) {
     
     if (error) {
       console.error('Error exchanging code for session:', error)
-      return NextResponse.redirect(new URL('/register?error=auth_failed', request.url))
+      return NextResponse.redirect(new URL('/register?error=auth_failed', baseUrl))
     }
 
     if (!data.user) {
-      return NextResponse.redirect(new URL('/register?error=no_user', request.url))
+      return NextResponse.redirect(new URL('/register?error=no_user', baseUrl))
     }
 
     // Redirect based on user type
@@ -28,7 +32,7 @@ export async function GET(request: NextRequest) {
       case 'participant':
         // Check if user has existing BEAM participant data
         // For now, redirect to dashboard
-        return NextResponse.redirect(new URL('/dashboard', request.url))
+        return NextResponse.redirect(new URL('/dashboard', baseUrl))
       
       case 'partner':
         // Check if user has existing partnership
@@ -41,23 +45,23 @@ export async function GET(request: NextRequest) {
 
         if (partnership) {
           // User has approved partnership, redirect to institution dashboard
-          return NextResponse.redirect(new URL('/institution-dashboard', request.url))
+          return NextResponse.redirect(new URL('/institution-dashboard', baseUrl))
         } else {
           // No partnership or not approved, redirect to contact form
-          return NextResponse.redirect(new URL('/contact', request.url))
+          return NextResponse.redirect(new URL('/contact', baseUrl))
         }
       
       case 'community':
         // New community member, redirect to dashboard
-        return NextResponse.redirect(new URL('/dashboard', request.url))
+        return NextResponse.redirect(new URL('/dashboard', baseUrl))
       
       default:
         // Default to dashboard
-        return NextResponse.redirect(new URL('/dashboard', request.url))
+        return NextResponse.redirect(new URL('/dashboard', baseUrl))
     }
 
   } catch (error) {
     console.error('Error in OAuth callback:', error)
-    return NextResponse.redirect(new URL('/register?error=callback_failed', request.url))
+    return NextResponse.redirect(new URL('/register?error=callback_failed', baseUrl))
   }
 }
