@@ -43,7 +43,12 @@ const courses = [
     level: "Beginner",
     featured: true,
     imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/home/pexels-kampus-7983573.jpg", // Placeholder for tech course image
-    videoUrl: null
+    videoUrl: null,
+    location: "Rosel Fann Recreation Center",
+    startDate: "2024-09-14",
+    endDate: "2024-10-26",
+    classTime: "Saturdays, 3:00 PM - 5:00 PM",
+    enrollmentStatus: "available" // Available for enrollment
   },
   {
     id: 2,
@@ -58,7 +63,8 @@ const courses = [
     level: "Beginner",
     featured: true,
     imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-daniel-andraski-197681005-13065692.jpg", // Placeholder for car maintenance image
-    videoUrl: null
+    videoUrl: null,
+    enrollmentStatus: "available" // Available for enrollment
   },
   {
     id: 3,
@@ -73,7 +79,8 @@ const courses = [
     level: "Beginner",
     featured: true,
     imageUrl: "https://sdyyvwazlkcihsrivnff.supabase.co/storage/v1/object/public/Courses/Static%20Card%20assets/pexels-tima-miroshnichenko-6671694.jpg", // Placeholder for orchestra image
-    videoUrl: null
+    videoUrl: null,
+    enrollmentStatus: "available" // Available for enrollment
   },
   {
     id: 4,
@@ -92,7 +99,8 @@ const courses = [
     location: "Cleveland Ave Library",
     startDate: "2024-09-10",
     endDate: "2024-11-05",
-    classTime: "Tuesdays, 6:00 PM - 7:30 PM"
+    classTime: "Tuesdays, 6:00 PM - 7:30 PM",
+    enrollmentStatus: "available" // Institution has onboarded this course
   },
   {
     id: 5,
@@ -111,7 +119,8 @@ const courses = [
     location: "Cleveland Ave Library",
     startDate: "2024-09-11",
     endDate: "2024-11-13",
-    classTime: "Wednesdays, 6:00 PM - 8:00 PM"
+    classTime: "Wednesdays, 6:00 PM - 8:00 PM",
+    enrollmentStatus: "available" // Institution has onboarded this course
   },
   {
     id: 6,
@@ -130,7 +139,8 @@ const courses = [
     location: "Cleveland Ave Library",
     startDate: "2024-09-12",
     endDate: "2024-12-05",
-    classTime: "Thursdays, 6:00 PM - 8:00 PM"
+    classTime: "Thursdays, 6:00 PM - 8:00 PM",
+    enrollmentStatus: "available" // Institution has onboarded this course
   },
   {
     id: 7,
@@ -575,6 +585,17 @@ export default function CoursesPage() {
       }, 2000)
       return
     }
+
+    // Find the course to check its enrollment status
+    const course = courses.find(c => c.id === courseId)
+    if (!course) {
+      setToastMessage('Course not found')
+      setToastType('error')
+      setShowToast(true)
+      return
+    }
+
+    // All courses are available for enrollment
 
     setEnrolling(courseId)
     try {
@@ -1088,15 +1109,16 @@ export default function CoursesPage() {
                                                   {/* Quick Add Button or Enrolled Status */}
                             {!enrolledCourses.includes(course.id) ? (
                               <div className="absolute top-4 left-4">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleEnroll(course.id)
-                                  }}
-                                  disabled={enrolling === course.id}
-                                  className="inline-flex items-center gap-1 px-2 py-1 text-xs text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors shadow-sm"
-                                  title="Quick add to your courses"
-                                >
+                                {(
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleEnroll(course.id)
+                                    }}
+                                    disabled={enrolling === course.id}
+                                    className="inline-flex items-center gap-1 px-2 py-1 text-xs text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors shadow-sm"
+                                    title="Quick add to your courses"
+                                  >
                                   {enrolling === course.id ? (
                                     <>
                                       <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white"></div>
@@ -1108,7 +1130,8 @@ export default function CoursesPage() {
                                       <span>Quick Add</span>
                                     </>
                                   )}
-                                </button>
+                                  </button>
+                                )}
                               </div>
                             ) : (
                               <div className="absolute top-4 left-4">

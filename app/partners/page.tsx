@@ -67,6 +67,20 @@ export default function PartnersPage() {
       courses: ["Digital Literacy", "Creative Arts", "Language Learning", "STEM Activities"],
       capacity: "20-25 people",
       amenities: ["Mobile Printing", "Computer Access", "Meeting Rooms", "Free WiFi", "Accessible"]
+    },
+    {
+      id: 3,
+      name: "Rosel Fann Recreation Center",
+      address: "365 Cleveland Ave SE, Atlanta, GA 30354",
+      phone: "(404) 546-6789",
+      email: "roselfann@atlantaga.gov",
+      website: "https://www.atlantaga.gov/",
+      hours: "Mon-Fri: 8AM-8PM, Sat: 10AM-4PM, Sun: Closed",
+      description: "A dynamic community recreation center offering fitness programs, educational workshops, and community events. Perfect for skill-building courses and community engagement.",
+      imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      courses: ["Intro to Tech for All Ages", "Community Fitness", "Creative Arts", "Youth Programs"],
+      capacity: "30-40 people",
+      amenities: ["Fitness Center", "Meeting Rooms", "Computer Lab", "Parking", "Accessible", "Kitchen Facilities"]
     }
   ]
 
@@ -398,9 +412,11 @@ export default function PartnersPage() {
                         </div>
                       )}
                     </div>
+                  </section>
           
           {/* Call to Action */}
           <div className="text-center mt-16">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-semibold text-[#7A3B3B] mb-4 font-satoshi">
               Want to Partner With Us?
             </h2>
@@ -408,20 +424,22 @@ export default function PartnersPage() {
               If you represent an institution that would like to host our skill-building courses, 
               we'd love to hear from you. Let's work together to strengthen our community.
             </p>
-                                    <div className="flex flex-col sm:flex-row gap-4">
-                          <Link
-                            href="/contact"
-                            className="bg-[#7A3B3B] hover:bg-[#6A2B2B] text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi inline-block"
-                          >
-                            Become a Partner
-                          </Link>
-                          <Link
-                            href="/partner-login"
-                            className="bg-white border-2 border-[#7A3B3B] text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi inline-block"
-                          >
-                            Partner Login
-                          </Link>
-                        </div>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    href="/contact"
+                    className="bg-[#7A3B3B] hover:bg-[#6A2B2B] text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi inline-block"
+                  >
+                    Become a Partner
+                  </Link>
+                  <Link
+                    href="/partner-login"
+                    className="bg-white border-2 border-[#7A3B3B] text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi inline-block"
+                  >
+                    Partner Login
+                  </Link>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
