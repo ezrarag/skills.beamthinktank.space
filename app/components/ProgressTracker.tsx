@@ -122,7 +122,7 @@ export default function ProgressTracker({ userId, courseId }: ProgressTrackerPro
         let attendanceStreak = 0
         if (attendance && attendance.length > 0) {
           const sortedAttendance = attendance
-            .sort((a, b) => new Date(b.joined_at).getTime() - new Date(a.joined_at).getTime())
+            .sort((a: any, b: any) => new Date(b.joined_at).getTime() - new Date(a.joined_at).getTime())
           
           let currentStreak = 0
           for (let i = 0; i < sortedAttendance.length - 1; i++) {
@@ -140,13 +140,13 @@ export default function ProgressTracker({ userId, courseId }: ProgressTrackerPro
         }
 
         // Get next session
-        const nextSession = sessions?.find(s => 
+        const nextSession = sessions?.find((s: any) => 
           new Date(s.session_date) > new Date()
         )?.session_date || null
 
         // Get last attendance
         const lastAttendance = attendance && attendance.length > 0 ? 
-          attendance.sort((a, b) => new Date(b.joined_at).getTime() - new Date(a.joined_at).getTime())[0].joined_at : 
+          attendance.sort((a: any, b: any) => new Date(b.joined_at).getTime() - new Date(a.joined_at).getTime())[0].joined_at : 
           null
 
         progressData.push({

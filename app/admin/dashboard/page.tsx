@@ -71,7 +71,7 @@ export default function AdminDashboardPage() {
       if (enrollmentsError) throw enrollmentsError
 
       // Process enrollments data
-      const processedEnrollments = enrollmentsData?.map(enrollment => ({
+      const processedEnrollments = enrollmentsData?.map((enrollment: any) => ({
         ...enrollment,
         user_email: (enrollment as any).profiles?.email || 'Unknown',
         course_title: (enrollment as any).courses?.title || 'Unknown Course'

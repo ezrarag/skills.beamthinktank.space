@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-key'
+
+const supabase = supabaseUrl.includes('placeholder') ? null : createClient(supabaseUrl, supabaseServiceKey)
 
 // POST - Create new partnership application
 export async function POST(request: NextRequest) {
+  if (!supabase) {
+    return NextResponse.json({ error: 'Database not configured' }, { status: 503 })
+  }
+  
   try {
     const body = await request.json()
     const { 
@@ -73,6 +77,10 @@ export async function POST(request: NextRequest) {
 
 // GET - List partnerships (admin only)
 export async function GET(request: NextRequest) {
+  if (!supabase) {
+    return NextResponse.json({ partnerships: [] }, { status: 200 })
+  }
+  
   try {
     // Check if user is authenticated and is admin
     const authHeader = request.headers.get('authorization')

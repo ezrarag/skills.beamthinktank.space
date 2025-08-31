@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { supabase } from '@/lib/supabase'
 import { 
   Brain, 
   MapPin, 
@@ -321,7 +322,7 @@ export default function InstitutionDashboardPage() {
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {institutionData.courses.map((course) => (
+              {institutionData.courses.map((course: any) => (
                 <div key={course.id} className="bg-white rounded-2xl shadow-lg p-6">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-xl font-semibold text-[#7A3B3B] font-satoshi">{course.title}</h3>

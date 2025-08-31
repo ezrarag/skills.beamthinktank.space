@@ -86,8 +86,8 @@ export default function PartnersPage() {
 
   // Combine hardcoded institutions with approved partnerships from database
   const approvedPartnerships = partnerships
-    .filter((p: any) => p.status === 'approved')
-    .map((p: any) => ({
+    .filter(p => p.status === 'approved')
+    .map(p => ({
       id: `db-${p.id}`,
       name: p.institution_name,
       address: p.address,
@@ -278,168 +278,170 @@ export default function PartnersPage() {
         </div>
       </section>
 
-      {/* Institutions Grid */}
-      <section className="py-16">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-          {loading ? (
-            <div className="text-center py-12">
-              <div className="w-8 h-8 border-2 border-[#7A3B3B] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading partnerships...</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {allInstitutions.map((institution: any, index: number) => (
-                <motion.div
-                  key={institution.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 ${
-                    institution.isNewPartner ? 'ring-2 ring-[#7A3B3B] ring-opacity-50' : ''
-                  }`}
-                >
-                  {/* Image */}
-                  <div className="h-48 overflow-hidden relative">
-                    <img 
-                      src={institution.imageUrl}
-                      alt={institution.name}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                    {institution.isNewPartner && (
-                      <div className="absolute top-4 right-4 bg-[#7A3B3B] text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
-                        <Plus className="h-3 w-3" />
-                        <span>New Partner</span>
-                      </div>
-                    )}
+                        {/* Institutions Grid */}
+                  <section className="py-16">
+                    <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+                      {loading ? (
+                        <div className="text-center py-12">
+                          <div className="w-8 h-8 border-2 border-[#7A3B3B] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                          <p className="text-gray-600">Loading partnerships...</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {allInstitutions.map((institution, index) => (
+              <motion.div
+                key={institution.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                className={`bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 ${
+                  institution.isNewPartner ? 'ring-2 ring-[#7A3B3B] ring-opacity-50' : ''
+                }`}
+              >
+                {/* Image */}
+                <div className="h-48 overflow-hidden relative">
+                  <img 
+                    src={institution.imageUrl}
+                    alt={institution.name}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                  {institution.isNewPartner && (
+                    <div className="absolute top-4 right-4 bg-[#7A3B3B] text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                      <Plus className="h-3 w-3" />
+                      <span>New Partner</span>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Content */}
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <h3 className="text-2xl font-semibold text-[#7A3B3B] font-satoshi">
+                      {institution.name}
+                    </h3>
+                    <Building2 className="h-6 w-6 text-[#7A3B3B]" />
                   </div>
                   
-                  {/* Content */}
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-2xl font-semibold text-[#7A3B3B] font-satoshi">
-                        {institution.name}
-                      </h3>
-                      <Building2 className="h-6 w-6 text-[#7A3B3B]" />
+                  <p className="text-gray-600 mb-4 font-satoshi">
+                    {institution.description}
+                  </p>
+                  
+                  {/* Contact Info */}
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <MapPinIcon className="h-4 w-4 text-[#7A3B3B]" />
+                      <span className="text-sm">{institution.address}</span>
                     </div>
-                    
-                    <p className="text-gray-600 mb-4 font-satoshi">
-                      {institution.description}
-                    </p>
-                    
-                    {/* Contact Info */}
-                    <div className="space-y-2 mb-4">
-                      <div className="flex items-center space-x-2 text-gray-600">
-                        <MapPinIcon className="h-4 w-4 text-[#7A3B3B]" />
-                        <span className="text-sm">{institution.address}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-gray-600">
-                        <Phone className="h-4 w-4 text-[#7A3B3B]" />
-                        <span className="text-sm">{institution.phone}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-gray-600">
-                        <Mail className="h-4 w-4 text-[#7A3B3B]" />
-                        <span className="text-sm">{institution.email}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-gray-600">
-                        <Clock className="h-4 w-4 text-[#7A3B3B]" />
-                        <span className="text-sm">{institution.hours}</span>
-                      </div>
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <Phone className="h-4 w-4 text-[#7A3B3B]" />
+                      <span className="text-sm">{institution.phone}</span>
                     </div>
-                    
-                    {/* Courses */}
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-[#7A3B3B] mb-2 font-satoshi">Available Courses:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {institution.courses.map((course: string, courseIndex: number) => (
-                          <span 
-                            key={courseIndex}
-                            className={`px-3 py-1 rounded-full text-sm font-satoshi ${
-                              institution.isNewPartner 
-                                ? 'bg-[#7A3B3B] text-white' 
-                                : 'bg-[#7A3B3B]/10 text-[#7A3B3B]'
-                            }`}
-                          >
-                            {course}
-                          </span>
-                        ))}
-                      </div>
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <Mail className="h-4 w-4 text-[#7A3B3B]" />
+                      <span className="text-sm">{institution.email}</span>
                     </div>
-                    
-                    {/* Amenities */}
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-[#7A3B3B] mb-2 font-satoshi">Amenities:</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {institution.amenities.map((amenity: string, amenityIndex: number) => (
-                          <span 
-                            key={amenityIndex}
-                            className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-satoshi"
-                          >
-                            {amenity}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    {/* Capacity */}
-                    <div className="mb-4">
-                      <span className="text-sm text-gray-600 font-satoshi">
-                        <strong>Capacity:</strong> {institution.capacity}
-                      </span>
-                    </div>
-                    
-                    {/* Website Link */}
-                    <div className="flex justify-between items-center">
-                      <a 
-                        href={institution.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-2 text-[#7A3B3B] hover:text-[#6A2B2B] transition-colors duration-200 font-satoshi"
-                      >
-                        <Globe className="h-4 w-4" />
-                        <span>Visit Website</span>
-                      </a>
-                      
-                      <Link 
-                        href="/courses"
-                        className="bg-[#7A3B3B] hover:bg-[#6A2B2B] text-white px-4 py-2 rounded-lg transition-colors duration-200 font-satoshi"
-                      >
-                        View Courses
-                      </Link>
+                    <div className="flex items-center space-x-2 text-gray-600">
+                      <Clock className="h-4 w-4 text-[#7A3B3B]" />
+                      <span className="text-sm">{institution.hours}</span>
                     </div>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+                  
+                  {/* Courses */}
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-[#7A3B3B] mb-2 font-satoshi">Available Courses:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {institution.courses.map((course, courseIndex) => (
+                        <span 
+                          key={courseIndex}
+                          className={`px-3 py-1 rounded-full text-sm font-satoshi ${
+                            institution.isNewPartner 
+                              ? 'bg-[#7A3B3B] text-white' 
+                              : 'bg-[#7A3B3B]/10 text-[#7A3B3B]'
+                          }`}
+                        >
+                          {course}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Amenities */}
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-[#7A3B3B] mb-2 font-satoshi">Amenities:</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {institution.amenities.map((amenity, amenityIndex) => (
+                        <span 
+                          key={amenityIndex}
+                          className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm font-satoshi"
+                        >
+                          {amenity}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Capacity */}
+                  <div className="mb-4">
+                    <span className="text-sm text-gray-600 font-satoshi">
+                      <strong>Capacity:</strong> {institution.capacity}
+                    </span>
+                  </div>
+                  
+                  {/* Website Link */}
+                  <div className="flex justify-between items-center">
+                    <a 
+                      href={institution.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center space-x-2 text-[#7A3B3B] hover:text-[#6A2B2B] transition-colors duration-200 font-satoshi"
+                    >
+                      <Globe className="h-4 w-4" />
+                      <span>Visit Website</span>
+                    </a>
+                    
+                    <Link 
+                      href="/courses"
+                      className="bg-[#7A3B3B] hover:bg-[#6A2B2B] text-white px-4 py-2 rounded-lg transition-colors duration-200 font-satoshi"
+                    >
+                      View Courses
+                    </Link>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+                        </div>
+                      )}
+                    </div>
+                  </section>
           
-      {/* Call to Action */}
-      <section className="py-16 bg-gradient-to-r from-[#7A3B3B]/5 to-[#6A2B2B]/5">
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-semibold text-[#7A3B3B] mb-4 font-satoshi">
-            Want to Partner With Us?
-          </h2>
-          <p className="text-lg text-[#7A3B3B]/80 mb-8 max-w-2xl mx-auto font-satoshi">
-            If you represent an institution that would like to host our skill-building courses, 
-            we'd love to hear from you. Let's work together to strengthen our community.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="bg-[#7A3B3B] hover:bg-[#6A2B2B] text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi inline-block"
-            >
-              Become a Partner
-            </Link>
-            <Link
-              href="/partner-login"
-              className="bg-white border-2 border-[#7A3B3B] text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi inline-block"
-            >
-              Partner Login
-            </Link>
+          {/* Call to Action */}
+          <div className="text-center mt-16">
+            <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 className="text-3xl font-semibold text-[#7A3B3B] mb-4 font-satoshi">
+                Want to Partner With Us?
+              </h2>
+              <p className="text-lg text-[#7A3B3B]/80 mb-8 max-w-2xl mx-auto font-satoshi">
+                If you represent an institution that would like to host our skill-building courses, 
+                we'd love to hear from you. Let's work together to strengthen our community.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link
+                  href="/contact"
+                  className="bg-[#7A3B3B] hover:bg-[#6A2B2B] text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi inline-block"
+                >
+                  Become a Partner
+                </Link>
+                <Link
+                  href="/partner-login"
+                  className="bg-white border-2 border-[#7A3B3B] text-[#7A3B3B] hover:bg-[#7A3B3B] hover:text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-lg font-satoshi inline-block"
+                >
+                  Partner Login
+                </Link>
+              </div>
+            </div>
           </div>
-        </div>
       </section>
+      </div>
     </div>
   )
 }

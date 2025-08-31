@@ -103,7 +103,7 @@ export default function SetupGuide({ isOpen, onClose, userId, onDataUpdate }: Se
 
       // Check attendance mode for enrolled courses
       if (enrollments && enrollments.length > 0) {
-        const hasAttendanceMode = enrollments.some(enrollment => 
+        const hasAttendanceMode = enrollments.some((enrollment: any) => 
           enrollment.attendance_mode && enrollment.attendance_mode !== 'in-person'
         )
         setupTasks.find(task => task.id === 'attendance')!.completed = hasAttendanceMode

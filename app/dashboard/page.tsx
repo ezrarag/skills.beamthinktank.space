@@ -214,7 +214,7 @@ export default function DashboardPage() {
           console.log('🔍 DEBUG: Processing enrollments:', enrollments)
           console.log('🔍 DEBUG: Number of enrollments:', enrollments.length)
           
-          const courses = enrollments.map(enrollment => {
+          const courses = enrollments.map((enrollment: any) => {
             const course = enrollment.courses
             console.log('🔍 DEBUG: Processing course from enrollment:', enrollment)
             console.log('🔍 DEBUG: Course data:', course)
@@ -236,14 +236,14 @@ export default function DashboardPage() {
               status: 'in-progress',
               lastAccessed: new Date().toISOString().split('T')[0]
             }
-          }).filter((course): course is Course => course !== null) // Remove null entries with proper typing
+          }).filter((course: any): course is Course => course !== null) // Remove null entries with proper typing
           
           console.log('✅ SUCCESS: Processed courses:', courses)
           console.log('✅ SUCCESS: Setting enrolledCourses state:', courses)
           setEnrolledCourses(courses)
           
           // Generate upcoming sessions
-          const sessions = courses.map(course => ({
+          const sessions = courses.map((course: any) => ({
             id: course.id,
             course: course.title,
             date: course.nextSession,
@@ -373,7 +373,7 @@ export default function DashboardPage() {
       console.log('✅ VERIFY: Local enrolledCourses:', enrolledCourses)
       
       // Check for mismatches
-      const dbCourseIds = enrollments?.map(e => e.course_id) || []
+      const dbCourseIds = enrollments?.map((e: any) => e.course_id) || []
       const localCourseIds = enrolledCourses.map(c => c.id)
       
       if (dbCourseIds.length !== localCourseIds.length) {
@@ -419,7 +419,7 @@ export default function DashboardPage() {
       console.log('✅ REFRESH: Fresh enrollments fetched:', enrollments)
       
       if (enrollments) {
-        const courses = enrollments.map(enrollment => {
+        const courses = enrollments.map((enrollment: any) => {
           const course = enrollment.courses
           if (!course) return null
           
@@ -435,13 +435,13 @@ export default function DashboardPage() {
             status: 'in-progress',
             lastAccessed: new Date().toISOString().split('T')[0]
           }
-        }).filter((course): course is Course => course !== null)
+        }).filter((course: any): course is Course => course !== null)
         
         console.log('✅ REFRESH: Setting new enrolledCourses:', courses)
         setEnrolledCourses(courses)
         
         // Update upcoming sessions
-        const sessions = courses.map(course => ({
+        const sessions = courses.map((course: any) => ({
           id: course.id,
           course: course.title,
           date: course.nextSession,

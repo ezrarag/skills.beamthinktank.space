@@ -221,7 +221,7 @@ export class MultiDeliveryService {
       total: 0
     }
     
-    data?.forEach(attendance => {
+    data?.forEach((attendance: any) => {
       switch (attendance.attendance_mode) {
         case 'in-person':
           breakdown.inPerson++

@@ -30,7 +30,8 @@ export default function AttendanceModeSelector({
     
     try {
       // Get current user ID from Supabase auth
-      const { data: { user } } = await import('@/lib/supabase').then(m => m.supabase.auth.getUser())
+      const { supabase } = await import('@/lib/supabase')
+      const { data: { user } } = await supabase.auth.getUser()
       
       if (!user) {
         throw new Error('User not authenticated')

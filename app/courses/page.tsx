@@ -535,7 +535,7 @@ export default function CoursesPage() {
           .in('status', ['confirmed', 'pending'])
         
         if (enrollments) {
-          setEnrolledCourses(enrollments.map(e => e.course_id))
+          setEnrolledCourses(enrollments.map((e: any) => e.course_id))
         }
       }
     }
